@@ -525,9 +525,12 @@ export function transformData(data) {
 
       toggleDiscordAnalysis: ["serverId", "channelId"],
 
-      // New input type for toggle and number of connections
-      toggleAndInput: ["numberOfConnections"],
-      // New input type for toggle and probability
+      toggleAndInput: ["username", "numberOfPosts", "commentType"],
+
+      toggleAndURL: ["space_link"],
+
+      toggleAndAPI: ["api_key"],
+
       toggleAndProbability: ["probability", "tweetsPerDay", "date"],
     };
 

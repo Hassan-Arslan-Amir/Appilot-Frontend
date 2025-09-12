@@ -22,6 +22,8 @@ function Save({ task, saveHandler, devicesNavigator, disabled }) {
       case "toggleandgap":
       case "toggleandunfollowinputs":
       case "toggleandinput":
+      case "toggleandurl":
+      case "toggleandapi":
       case "toggleandprobability":
         return el.input ? <Tick class="greenCheck" /> : <Cut class="redCut" />;
       default:

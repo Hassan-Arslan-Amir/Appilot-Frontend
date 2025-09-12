@@ -1059,6 +1059,7 @@ function Input(props) {
             )}
           </div>
         );
+      // Inputs for the Twitter Bot
       case "toggleAndInput":
         return (
           <div className={classes.Inputscontainer}>
@@ -1069,24 +1070,91 @@ function Input(props) {
               InnerIndex={InnerIndex}
             />
             {el.input && (
-              <NumberInput
-                lable={"Number of Connections:"}
-                onChange={(value) => {
-                  inputTextChangeHandler(
-                    index,
-                    InnerIndex,
-                    value,
-                    "numberOfConnections"
-                  );
+              <>
+                <InputText
+                  label={"Enter Username:"}
+                  type={"text"}
+                  placeholder={"Username"}
+                  name={"username"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "username");
+                  }}
+                  isTaskInputs={true}
+                  value={el.username}
+                />
+                <NumberInput
+                  lable={"Enter Number of Posts"}
+                  onChange={(value) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      value,
+                      "numberOfPosts"
+                    );
+                  }}
+                  min={1}
+                  Value={el.numberOfPosts}
+                />
+                <RadioOptions
+                  options={["Natural", "Funny", "Disagree", "Sad"]}
+                  initialValue={el.commentType || "Natural"}
+                  description={"Type of Comment:"}
+                  handler={(val) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      val,
+                      "commentType"
+                    );
+                  }}
+                />
+              </>
+            )}
+          </div>
+        );
+      case "toggleAndURL":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <InputText
+                label={"Enter Space Link:"}
+                type={"text"}
+                placeholder={"Place Space Link here"}
+                name={"space_link"}
+                handler={(val) => {
+                  inputTextChangeHandler(index, InnerIndex, val, "space_link");
                 }}
-                min={1}
-                Value={el.numberOfConnections}
+                isTaskInputs={true}
+                value={el.space_link}
+              />
+            )}
+          </div>
+        );
+      case "toggleAndAPI":
+        return (
+          <div className={classes.Inputscontainer}>
+            {el.input && (
+              <InputText
+                label={"Enter API Key of OpenAI:"}
+                type={"text"}
+                placeholder={"Place API Key here"}
+                name={"api_key"}
+                handler={(val) => {
+                  inputTextChangeHandler(index, InnerIndex, val, "api_key");
+                }}
+                isTaskInputs={true}
+                value={el.api_key}
               />
             )}
           </div>
         );
       case "toggleAndProbability":
-        // Always set the date if not present
         if (!el.date) {
           setInputs((prevState) => {
             const newInputs = { ...prevState };
