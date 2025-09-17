@@ -525,7 +525,7 @@ export function transformData(data) {
 
       toggleDiscordAnalysis: ["serverId", "channelId"],
 
-      toggleAndInput: ["username", "numberOfPosts", "commentType"],
+      toggleAndInput: ["username", "numberOfLikes", "numberOfReposts", "numberOfComments", "commentType"],
 
       toggleAndURL: ["space_link"],
 

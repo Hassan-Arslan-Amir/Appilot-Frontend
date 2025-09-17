@@ -1082,22 +1082,50 @@ function Input(props) {
                   isTaskInputs={true}
                   value={el.username}
                 />
-                <NumberInput
-                  lable={"Enter Number of Posts"}
-                  onChange={(value) => {
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "numberOfPosts"
-                    );
-                  }}
-                  min={1}
-                  Value={el.numberOfPosts}
-                />
+                <div style={{ display: "flex", gap: "30px", margin: "15px 0" }}>
+                  <NumberInput
+                    lable={"No. of Likes:"}
+                    onChange={(value) => {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "numberOfLikes"
+                      );
+                    }}
+                    min={1}
+                    Value={el.numberOfLikes}
+                  />
+                  <NumberInput
+                    lable={"No. of Comments:"}
+                    onChange={(value) => {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "numberOfComments"
+                      );
+                    }}
+                    min={1}
+                    Value={el.numberOfComments}
+                  />
+                  <NumberInput
+                    lable={"No. of Reposts/Quotes:"}
+                    onChange={(value) => {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "numberOfReposts"
+                      );
+                    }}
+                    min={1}
+                    Value={el.numberOfReposts}
+                  />
+                </div>
                 <RadioOptions
                   options={["Natural", "Funny", "Disagree", "Sad"]}
-                  initialValue={el.commentType || "Natural"}
+                  //initialValue={el.commentType || "Natural"}
                   description={"Type of Comment:"}
                   handler={(val) => {
                     inputTextChangeHandler(
