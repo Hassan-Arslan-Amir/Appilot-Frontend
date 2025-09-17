@@ -34,8 +34,8 @@ function useSaveTask() {
       const Loadingid = loadingToast("Saving Task");
       // setError(null);
       const value = `${document.cookie}`;
-      //const response = await fetch("https://server.appilot.app/send_command", {
-      const response = await fetch("http://127.0.0.1:8000/send_command", {
+      const response = await fetch("https://server.appilot.app/send_command", {
+      //const response = await fetch("http://127.0.0.1:8000/send_command", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
