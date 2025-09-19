@@ -3,15 +3,6 @@ import Classes from "./RadioOptions.module.css";
 
 function RadioOptions(props) {
   const { options, initialValue, handler, description } = props;
-  const [selectedValue, setSelectedValue] = React.useState(initialValue);
-
-  const handleChange = (event) => {
-    const newValue = event.target.value;
-    setSelectedValue(newValue);
-    if (handler) {
-      handler(newValue);
-    }
-  };
 
   return (
     <div style={{ fontFamily: "Arial, sans-serif" }}>
@@ -26,10 +17,10 @@ function RadioOptions(props) {
           <label key={option} className={Classes.labelWrapper}>
             <input
               type="radio"
-              name="radio-group"
+              name={props.name}
               value={option}
-              checked={selectedValue === option}
-              onChange={handleChange}
+              checked={props.value === option}
+              onChange={() => handler(option)}
               className={Classes.randioButton}
             />
             <span className={Classes.optionText}>{option}</span>

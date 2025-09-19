@@ -1071,71 +1071,180 @@ function Input(props) {
             />
             {el.input && (
               <>
-                <InputText
-                  label={"Enter Username:"}
-                  type={"text"}
-                  placeholder={"Username"}
-                  name={"username"}
-                  handler={(val) => {
-                    inputTextChangeHandler(index, InnerIndex, val, "username");
-                  }}
-                  isTaskInputs={true}
-                  value={el.username}
-                />
-                <div style={{ display: "flex", gap: "30px", margin: "15px 0" }}>
-                  <NumberInput
-                    lable={"No. of Likes:"}
-                    onChange={(value) => {
-                      inputTextChangeHandler(
-                        index,
-                        InnerIndex,
-                        value,
-                        "numberOfLikes"
-                      );
-                    }}
-                    min={1}
-                    Value={el.numberOfLikes}
-                  />
-                  <NumberInput
-                    lable={"No. of Comments:"}
-                    onChange={(value) => {
-                      inputTextChangeHandler(
-                        index,
-                        InnerIndex,
-                        value,
-                        "numberOfComments"
-                      );
-                    }}
-                    min={1}
-                    Value={el.numberOfComments}
-                  />
-                  <NumberInput
-                    lable={"No. of Reposts/Quotes:"}
-                    onChange={(value) => {
-                      inputTextChangeHandler(
-                        index,
-                        InnerIndex,
-                        value,
-                        "numberOfReposts"
-                      );
-                    }}
-                    min={1}
-                    Value={el.numberOfReposts}
-                  />
-                </div>
-                <RadioOptions
-                  options={["Natural", "Funny", "Disagree", "Sad"]}
-                  //initialValue={el.commentType || "Natural"}
-                  description={"Type of Comment:"}
-                  handler={(val) => {
+                <NumberInput
+                  lable={"How many profiles?"}
+                  onChange={(value) => {
+                    // Initialize posts array if not present or adjust its length
                     inputTextChangeHandler(
                       index,
                       InnerIndex,
-                      val,
-                      "commentType"
+                      value,
+                      "numberOfPosts"
                     );
+                    setInputs((prevState) => {
+                      const newInputs = { ...prevState };
+                      const item = newInputs.inputs[index].inputs[InnerIndex];
+                      let posts = item.posts || [];
+                      const n = parseInt(value) || 0;
+                      if (n > posts.length) {
+                        // Add new empty post objects
+                        posts = posts.concat(
+                          Array(n - posts.length)
+                            .fill()
+                            .map(() => ({
+                              username: "",
+                              numberOfLikes: "",
+                              numberOfComments: "",
+                              numberOfReposts: "",
+                              numberOfQuotes: "",
+                              commentType: "",
+                            }))
+                        );
+                      } else if (n < posts.length) {
+                        posts = posts.slice(0, n);
+                      }
+                      item.posts = posts;
+                      return newInputs;
+                    });
                   }}
+                  min={1}
+                  Value={el.numberOfPosts || ""}
                 />
+                {Array.isArray(el.posts) && el.posts.length > 0 && (
+                  <div style={{ marginTop: 16 }}>
+                    {el.posts.map((post, postIdx) => (
+                      <div
+                        key={postIdx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 8,
+                            fontWeight: 500,
+                            color: "#fff",
+                          }}
+                        >
+                          Profile #{postIdx + 1}
+                        </div>
+                        <InputText
+                          label={"Enter Username:"}
+                          type={"text"}
+                          placeholder={"Username"}
+                          name={`username_${postIdx}`}
+                          handler={(val) => {
+                            setInputs((prevState) => {
+                              const newInputs = { ...prevState };
+                              newInputs.inputs[index].inputs[InnerIndex].posts[
+                                postIdx
+                              ].username = val;
+                              return newInputs;
+                            });
+                          }}
+                          isTaskInputs={true}
+                          value={post.username}
+                        />
+                        <NumberInput
+                          lable={"No. of Posts You want the bot to interact with:"}
+                          onChange={(value) => {
+                            setInputs((prevState) => {
+                              const newInputs = { ...prevState };
+                              newInputs.inputs[index].inputs[InnerIndex].posts[
+                                postIdx
+                              ].numOfPosts = value;
+                              return newInputs;
+                            });
+                          }}
+                          min={1}
+                          Value={post.numOfPosts}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "20px",
+                            margin: "15px 0",
+                          }}
+                        >
+                          <NumberInput
+                            lable={"No. of Likes:"}
+                            onChange={(value) => {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].numberOfLikes = value;
+                                return newInputs;
+                              });
+                            }}
+                            min={1}
+                            Value={post.numberOfLikes}
+                          />
+                          <NumberInput
+                            lable={"No. of Comments:"}
+                            onChange={(value) => {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].numberOfComments = value;
+                                return newInputs;
+                              });
+                            }}
+                            min={1}
+                            Value={post.numberOfComments}
+                          />
+                          <NumberInput
+                            lable={"No. of Reposts:"}
+                            onChange={(value) => {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].numberOfReposts = value;
+                                return newInputs;
+                              });
+                            }}
+                            min={1}
+                            Value={post.numberOfReposts}
+                          />
+                          <NumberInput
+                            lable={"No. of Quotes:"}
+                            onChange={(value) => {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].numberOfQuotes = value;
+                                return newInputs;
+                              });
+                            }}
+                            min={1}
+                            Value={post.numberOfQuotes}
+                          />
+                        </div>
+                        <RadioOptions
+                          options={["Natural", "Funny", "Disagree", "Sad"]}
+                          description={"Type of Comment:"}
+                          value={post.commentType}
+                          handler={(val) => {
+                            setInputs((prevState) => {
+                              const newInputs = { ...prevState };
+                              newInputs.inputs[index].inputs[InnerIndex].posts[
+                                postIdx
+                              ].commentType = val;
+                              return newInputs;
+                            });
+                          }}
+                          name={`commentType_${index}_${InnerIndex}_${postIdx}`}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
               </>
             )}
           </div>
