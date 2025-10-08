@@ -1410,24 +1410,24 @@ function Input(props) {
       //       )}
       //     </div>
       //   );
-      case "toggleAndAPI":
-        return (
-          <div className={classes.Inputscontainer}>
-            {el.input && (
-              <InputText
-                label={"Enter API Key of OpenAI:"}
-                type={"text"}
-                placeholder={"Place API Key here"}
-                name={"api_key"}
-                handler={(val) => {
-                  inputTextChangeHandler(index, InnerIndex, val, "api_key");
-                }}
-                isTaskInputs={true}
-                value={el.api_key}
-              />
-            )}
-          </div>
-        );
+      // case "toggleAndAPI":
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       {el.input && (
+      //         <InputText
+      //           label={"Enter API Key of OpenAI:"}
+      //           type={"text"}
+      //           placeholder={"Place API Key here"}
+      //           name={"api_key"}
+      //           handler={(val) => {
+      //             inputTextChangeHandler(index, InnerIndex, val, "api_key");
+      //           }}
+      //           isTaskInputs={true}
+      //           value={el.api_key}
+      //         />
+      //       )}
+      //     </div>
+      //   );
       case "toggleAndProbability":
         if (!el.date) {
           setInputs((prevState) => {
