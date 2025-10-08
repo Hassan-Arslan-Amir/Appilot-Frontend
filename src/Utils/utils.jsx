@@ -533,11 +533,11 @@ export function transformData(data) {
 
       toggleAndProbability: ["probability", "tweetsPerDay", "date"],
 
-      //toggleAndPrompt: ["prompt"],
+      toggleAndPrompt: ["prompt"],
 
-      //toggleAndFollowUnfollow: ["usernames", "followAction"],
+      toggleAndFollowUnfollow: ["usernames", "usersPerDay", "followAction"],
 
-      toggleAndRetweet: ["tweetUrls", "numberOfTweets"],
+      toggleAndRetweet: ["tweetData"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today

@@ -1107,7 +1107,7 @@ function Input(props) {
                       return newInputs;
                     });
                   }}
-                  min={1}
+                  min={0}
                   Value={el.numberOfPosts || ""}
                 />
                 {Array.isArray(el.posts) && el.posts.length > 0 && (
@@ -1161,7 +1161,7 @@ function Input(props) {
                               return newInputs;
                             });
                           }}
-                          min={1}
+                          min={0}
                           Value={post.numOfPosts}
                         />
                         <div
@@ -1182,7 +1182,7 @@ function Input(props) {
                                 return newInputs;
                               });
                             }}
-                            min={1}
+                            min={0}
                             Value={post.numberOfLikes}
                           />
                           <NumberInput
@@ -1196,7 +1196,7 @@ function Input(props) {
                                 return newInputs;
                               });
                             }}
-                            min={1}
+                            min={0}
                             Value={post.numberOfComments}
                           />
                           <NumberInput
@@ -1210,7 +1210,7 @@ function Input(props) {
                                 return newInputs;
                               });
                             }}
-                            min={1}
+                            min={0}
                             Value={post.numberOfReposts}
                           />
                           <NumberInput
@@ -1224,7 +1224,7 @@ function Input(props) {
                                 return newInputs;
                               });
                             }}
-                            min={1}
+                            min={0}
                             Value={post.numberOfQuotes}
                           />
                         </div>
@@ -1244,74 +1244,6 @@ function Input(props) {
                           name={`commentType_${index}_${InnerIndex}_${postIdx}`}
                         />
                       </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        );
-
-      case "toggleAndRetweet":
-        return (
-          <div className={classes.Inputscontainer}>
-            <ToggleInput
-              el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
-              index={index}
-              InnerIndex={InnerIndex}
-            />
-            {el.input && (
-              <>
-                <NumberInput
-                  lable={"How many Tweets?"}
-                  onChange={(value) => {
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "numberOfTweets"
-                    );
-                    setInputs((prevState) => {
-                      const newInputs = { ...prevState };
-                      const item = newInputs.inputs[index].inputs[InnerIndex];
-                      let tweetUrls = item.tweetUrls || [];
-                      const n = parseInt(value) || 0;
-                      if (n > tweetUrls.length) {
-                        tweetUrls = tweetUrls.concat(
-                          Array(n - tweetUrls.length).fill("")
-                        );
-                      } else if (n < tweetUrls.length) {
-                        tweetUrls = tweetUrls.slice(0, n);
-                      }
-                      item.tweetUrls = tweetUrls;
-                      return newInputs;
-                    });
-                  }}
-                  min={1}
-                  Value={el.numberOfTweets || ""}
-                />
-                {Array.isArray(el.tweetUrls) && el.tweetUrls.length > 0 && (
-                  <div>
-                    {el.tweetUrls.map((url, idx) => (
-                      <InputText
-                        key={idx}
-                        label={`Tweet URL #${idx + 1}:`}
-                        type={"text"}
-                        placeholder={"Enter Tweet URL"}
-                        name={`tweetUrl_${idx}`}
-                        handler={(val) => {
-                          setInputs((prevState) => {
-                            const newInputs = { ...prevState };
-                            newInputs.inputs[index].inputs[
-                              InnerIndex
-                            ].tweetUrls[idx] = val;
-                            return newInputs;
-                          });
-                        }}
-                        isTaskInputs={true}
-                        value={url}
-                      />
                     ))}
                   </div>
                 )}
@@ -1344,72 +1276,280 @@ function Input(props) {
             )}
           </div>
         );
-      // case "toggleAndPrompt":
-      //   return (
-      //     <div className={classes.Inputscontainer}>
-      //       <ToggleInput
-      //         el={el}
-      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
-      //         index={index}
-      //         InnerIndex={InnerIndex}
-      //       />
-      //       {el.input && (
-      //         <InputText
-      //           label={"Enter Prompt here along with #Hashtags and @Mentions: "}
-      //           type={"text"}
-      //           placeholder={"Place Prompt here"}
-      //           name={"prompt"}
-      //           handler={(val) => {
-      //             inputTextChangeHandler(index, InnerIndex, val, "prompt");
-      //           }}
-      //           isTaskInputs={true}
-      //           value={el.prompt}
-      //         />
-      //       )}
-      //     </div>
-      //   );
-      // case "toggleAndFollowUnfollow":
-      //   return (
-      //     <div className={classes.Inputscontainer}>
-      //       <ToggleInput
-      //         el={el}
-      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
-      //         index={index}
-      //         InnerIndex={InnerIndex}
-      //       />
-      //       {el.input && (
-      //         <>
-      //           <InputText
-      //             label={
-      //               "Enter a list of profile usernames you want to follow/unfollow:"
-      //             }
-      //             type={"text"}
-      //             placeholder={"Place usernames here"}
-      //             name={"usernames"}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(index, InnerIndex, val, "usernames");
-      //             }}
-      //             isTaskInputs={true}
-      //             value={el.usernames}
-      //           />
-      //           <RadioOptions
-      //             options={["Follow", "Unfollow"]}
-      //             description={"Select action:"}
-      //             value={el.followAction}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 val,
-      //                 "followAction"
-      //               );
-      //             }}
-      //             name={`followAction_${index}_${InnerIndex}`}
-      //           />
-      //         </>
-      //       )}
-      //     </div>
-      //   );
+
+      case "toggleAndRetweet":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <NumberInput
+                  lable={"How many Tweets?"}
+                  onChange={(value) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      value,
+                      "numberOfTweets"
+                    );
+                    setInputs((prevState) => {
+                      const newInputs = { ...prevState };
+                      const item = newInputs.inputs[index].inputs[InnerIndex];
+                      let tweetData = item.tweetData || [];
+                      const n = parseInt(value) || 0;
+                      if (n > tweetData.length) {
+                        tweetData = tweetData.concat(
+                          Array(n - tweetData.length)
+                            .fill()
+                            .map(() => ({
+                              url: "",
+                              like: false,
+                              comment: false,
+                              repost: false,
+                              quote: false,
+                            }))
+                        );
+                      } else if (n < tweetData.length) {
+                        tweetData = tweetData.slice(0, n);
+                      }
+                      item.tweetData = tweetData;
+                      return newInputs;
+                    });
+                  }}
+                  min={0}
+                  Value={el.numberOfTweets || ""}
+                />
+                {Array.isArray(el.tweetData) && el.tweetData.length > 0 && (
+                  <div style={{ marginTop: 5 }}>
+                    {el.tweetData.map((tweet, idx) => (
+                      <div
+                        key={idx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 5,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 8,
+                            fontWeight: 500,
+                            color: "#fff",
+                          }}
+                        >
+                          Tweet #{idx + 1}
+                        </div>
+                        <InputText
+                          label={"Tweet URL:"}
+                          type={"text"}
+                          placeholder={"Enter Tweet URL"}
+                          name={`tweetUrl_${idx}`}
+                          handler={(val) => {
+                            setInputs((prevState) => {
+                              const newInputs = { ...prevState };
+                              newInputs.inputs[index].inputs[
+                                InnerIndex
+                              ].tweetData[idx].url = val;
+                              return newInputs;
+                            });
+                          }}
+                          isTaskInputs={true}
+                          value={tweet.url}
+                        />
+                        <div
+                          style={{
+                            display: "flex",
+                            gap: "52px",
+                            marginTop: 10,
+                          }}
+                        >
+                          <label
+                            style={{
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={tweet.like}
+                              onChange={(e) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].tweetData[idx].like = e.target.checked;
+                                  return newInputs;
+                                });
+                              }}
+                            />{" "}
+                            Like
+                          </label>
+                          <label
+                            style={{
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={tweet.comment}
+                              onChange={(e) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].tweetData[idx].comment = e.target.checked;
+                                  return newInputs;
+                                });
+                              }}
+                            />{" "}
+                            Comment
+                          </label>
+                          <label
+                            style={{
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={tweet.repost}
+                              onChange={(e) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].tweetData[idx].repost = e.target.checked;
+                                  return newInputs;
+                                });
+                              }}
+                            />{" "}
+                            Repost
+                          </label>
+                          <label
+                            style={{
+                              color: "#fff",
+                              display: "flex",
+                              alignItems: "center",
+                              gap: 4,
+                            }}
+                          >
+                            <input
+                              type="checkbox"
+                              checked={tweet.quote}
+                              onChange={(e) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].tweetData[idx].quote = e.target.checked;
+                                  return newInputs;
+                                });
+                              }}
+                            />{" "}
+                            Quote
+                          </label>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+        
+      case "toggleAndPrompt":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <InputText
+                label={"Enter Prompt here along with #Hashtags and @Mentions: "}
+                type={"text"}
+                placeholder={"Place Prompt here"}
+                name={"prompt"}
+                handler={(val) => {
+                  inputTextChangeHandler(index, InnerIndex, val, "prompt");
+                }}
+                isTaskInputs={true}
+                value={el.prompt}
+              />
+            )}
+          </div>
+        );
+      case "toggleAndFollowUnfollow":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <InputText
+                  label={
+                    "Enter a list of profile usernames you want to follow/unfollow:"
+                  }
+                  type={"text"}
+                  placeholder={"Place usernames here"}
+                  name={"usernames"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "usernames");
+                  }}
+                  isTaskInputs={true}
+                  value={el.usernames}
+                />
+                <NumberInput
+                  lable={"Number of users to follow/unfollow per day:"}
+                  onChange={(value) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      value,
+                      "usersPerDay"
+                    );
+                  }}
+                  min={0}
+                  Value={el.usersPerDay || ""}
+                />
+                <RadioOptions
+                  options={["Follow", "Unfollow"]}
+                  description={"Select action:"}
+                  value={el.followAction}
+                  handler={(val) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      val,
+                      "followAction"
+                    );
+                  }}
+                  name={`followAction_${index}_${InnerIndex}`}
+                />
+              </>
+            )}
+          </div>
+        );
       case "toggleAndAPI":
         return (
           <div className={classes.Inputscontainer}>
@@ -1486,7 +1626,7 @@ function Input(props) {
                       "probability"
                     );
                   }}
-                  min={1}
+                  min={0}
                   Value={el.probability}
                 />
                 <NumberInput
@@ -1499,7 +1639,7 @@ function Input(props) {
                       "tweetsPerDay"
                     );
                   }}
-                  min={1}
+                  min={0}
                   Value={el.tweetsPerDay}
                 />
               </>

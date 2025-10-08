@@ -23,8 +23,8 @@ function Save({ task, saveHandler, devicesNavigator, disabled }) {
       case "toggleandunfollowinputs":
       case "toggleandinput":
       case "toggleandurl":
-      //case "toggleandprompt":
-      //case "toggleandfollowunfollow":
+      case "toggleandprompt":
+      case "toggleandfollowunfollow":
       case "toggleandretweet":
       case "toggleandapi":
       case "toggleandprobability":
