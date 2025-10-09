@@ -1462,6 +1462,28 @@ function Input(props) {
                             Quote
                           </label>
                         </div>
+                        {/* Show comment prompt input if comment is checked */}
+                        {tweet.comment && (
+                          <div style={{ marginTop: 10 }}>
+                            <InputText
+                              label={"Comment Prompt:"}
+                              type={"text"}
+                              placeholder={"Enter comment prompt"}
+                              name={`commentPrompt_${idx}`}
+                              handler={(val) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].tweetData[idx].commentPrompt = val;
+                                  return newInputs;
+                                });
+                              }}
+                              isTaskInputs={true}
+                              value={tweet.commentPrompt || ""}
+                            />
+                          </div>
+                        )}
                       </div>
                     ))}
                   </div>
@@ -1470,7 +1492,7 @@ function Input(props) {
             )}
           </div>
         );
-        
+
       case "toggleAndPrompt":
         return (
           <div className={classes.Inputscontainer}>
