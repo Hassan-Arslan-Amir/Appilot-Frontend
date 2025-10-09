@@ -1495,61 +1495,61 @@ function Input(props) {
             )}
           </div>
         );
-      // case "toggleAndFollowUnfollow":
-      //   return (
-      //     <div className={classes.Inputscontainer}>
-      //       <ToggleInput
-      //         el={el}
-      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
-      //         index={index}
-      //         InnerIndex={InnerIndex}
-      //       />
-      //       {el.input && (
-      //         <>
-      //           <InputText
-      //             label={
-      //               "Enter a list of profile usernames you want to follow/unfollow:"
-      //             }
-      //             type={"text"}
-      //             placeholder={"Place usernames here"}
-      //             name={"usernames"}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(index, InnerIndex, val, "usernames");
-      //             }}
-      //             isTaskInputs={true}
-      //             value={el.usernames}
-      //           />
-      //           <NumberInput
-      //             lable={"Number of users to follow/unfollow per day:"}
-      //             onChange={(value) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 value,
-      //                 "usersPerDay"
-      //               );
-      //             }}
-      //             min={0}
-      //             Value={el.usersPerDay || ""}
-      //           />
-      //           <RadioOptions
-      //             options={["Follow", "Unfollow"]}
-      //             description={"Select action:"}
-      //             value={el.followAction}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 val,
-      //                 "followAction"
-      //               );
-      //             }}
-      //             name={`followAction_${index}_${InnerIndex}`}
-      //           />
-      //         </>
-      //       )}
-      //     </div>
-      //   );
+      case "toggleAndFollowUnfollow":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <InputText
+                  label={
+                    "Enter a list of profile usernames you want to follow/unfollow:"
+                  }
+                  type={"text"}
+                  placeholder={"Place usernames here"}
+                  name={"usernames"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "usernames");
+                  }}
+                  isTaskInputs={true}
+                  value={el.usernames}
+                />
+                <NumberInput
+                  lable={"Number of users to follow/unfollow per day:"}
+                  onChange={(value) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      value,
+                      "usersPerDay"
+                    );
+                  }}
+                  min={0}
+                  Value={el.usersPerDay || ""}
+                />
+                <RadioOptions
+                  options={["Follow", "Unfollow"]}
+                  description={"Select action:"}
+                  value={el.followAction}
+                  handler={(val) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      val,
+                      "followAction"
+                    );
+                  }}
+                  name={`followAction_${index}_${InnerIndex}`}
+                />
+              </>
+            )}
+          </div>
+        );
       case "toggleAndAPI":
         return (
           <div className={classes.Inputscontainer}>
