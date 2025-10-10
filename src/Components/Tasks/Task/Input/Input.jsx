@@ -1590,91 +1590,91 @@ function Input(props) {
             )}
           </div>
         );
-      case "toggleAndProbability":
-        if (!el.date) {
-          setInputs((prevState) => {
-            const newInputs = { ...prevState };
-            newInputs.inputs[index].inputs[InnerIndex] = {
-              ...el,
-              date: getTodayDDMMYYYY(),
-            };
-            return newInputs;
-          });
-        }
-        return (
-          <div className={classes.Inputscontainer}>
-            <ToggleInput
-              el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
-              index={index}
-              InnerIndex={InnerIndex}
-            />
-            {el.input && (
-              <>
-                <div style={{ marginTop: 10 }}>
-                  <label style={{ fontWeight: 500, color: "#fff" }}>
-                    Date:
-                  </label>
-                  <input
-                    type="text"
-                    value={el.date || getTodayDDMMYYYY()}
-                    onChange={(e) => {
-                      inputTextChangeHandler(
-                        index,
-                        InnerIndex,
-                        e.target.value,
-                        "date"
-                      );
-                    }}
-                    readOnly={false}
-                    style={{
-                      marginLeft: 8,
-                      padding: 4,
-                      borderRadius: 4,
-                      border: "1px solid #000",
-                      width: 120,
-                      backgroundColor: "#000",
-                      color: "#fff",
-                    }}
-                  />
-                </div>
-                <NumberInput
-                  lable={"Probability:"}
-                  onChange={(value) => {
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "probability"
-                    );
-                  }}
-                  min={0}
-                  Value={el.probability}
-                />
-                <NumberInput
-                  lable={"Number of Tweets to Interact Daily:"}
-                  onChange={(value) => {
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "tweetsPerDay"
-                    );
-                  }}
-                  min={0}
-                  Value={el.tweetsPerDay}
-                />
-              </>
-            )}
-            {/* Always render the date field (hidden) so it's sent to backend even if toggle is off */}
-            <input
-              type="hidden"
-              value={el.date || getTodayDDMMYYYY()}
-              readOnly
-              name="date"
-            />
-          </div>
-        );
+      // case "toggleAndProbability":
+      //   if (!el.date) {
+      //     setInputs((prevState) => {
+      //       const newInputs = { ...prevState };
+      //       newInputs.inputs[index].inputs[InnerIndex] = {
+      //         ...el,
+      //         date: getTodayDDMMYYYY(),
+      //       };
+      //       return newInputs;
+      //     });
+      //   }
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       <ToggleInput
+      //         el={el}
+      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
+      //         index={index}
+      //         InnerIndex={InnerIndex}
+      //       />
+      //       {el.input && (
+      //         <>
+      //           <div style={{ marginTop: 10 }}>
+      //             <label style={{ fontWeight: 500, color: "#fff" }}>
+      //               Date:
+      //             </label>
+      //             <input
+      //               type="text"
+      //               value={el.date || getTodayDDMMYYYY()}
+      //               onChange={(e) => {
+      //                 inputTextChangeHandler(
+      //                   index,
+      //                   InnerIndex,
+      //                   e.target.value,
+      //                   "date"
+      //                 );
+      //               }}
+      //               readOnly={false}
+      //               style={{
+      //                 marginLeft: 8,
+      //                 padding: 4,
+      //                 borderRadius: 4,
+      //                 border: "1px solid #000",
+      //                 width: 120,
+      //                 backgroundColor: "#000",
+      //                 color: "#fff",
+      //               }}
+      //             />
+      //           </div>
+      //           <NumberInput
+      //             lable={"Probability:"}
+      //             onChange={(value) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 value,
+      //                 "probability"
+      //               );
+      //             }}
+      //             min={0}
+      //             Value={el.probability}
+      //           />
+      //           <NumberInput
+      //             lable={"Number of Tweets to Interact Daily:"}
+      //             onChange={(value) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 value,
+      //                 "tweetsPerDay"
+      //               );
+      //             }}
+      //             min={0}
+      //             Value={el.tweetsPerDay}
+      //           />
+      //         </>
+      //       )}
+      //       {/* Always render the date field (hidden) so it's sent to backend even if toggle is off */}
+      //       <input
+      //         type="hidden"
+      //         value={el.date || getTodayDDMMYYYY()}
+      //         readOnly
+      //         name="date"
+      //       />
+      //     </div>
+      //   );
 
       default:
         return <p>Unknown input type</p>;
