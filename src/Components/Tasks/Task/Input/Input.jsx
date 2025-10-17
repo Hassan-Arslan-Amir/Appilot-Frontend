@@ -2,7 +2,7 @@
 import RightChevron from "../../../../assets/Icons/RightChevron";
 import GreyButton from "../../../Buttons/GreyButton";
 import classes from "./Input.module.css";
-import { useEffect, useState } from "react";
+import { act, useEffect, useState } from "react";
 import { successToast, failToast } from "../../../../Utils/utils";
 import { Table } from "lucide-react";
 import CompleteOverlay from "../../../Overlay/CompleteOverlay";
@@ -36,6 +36,7 @@ function Input(props) {
   const [inputs, setInputs] = useState(props.inputs ? props.inputs : null);
   const [inputsShowList, setInputsShowList] = useState([]);
   const [openItems, setOpenItems] = useState([]);
+  const [openDropdowns, setOpenDropdowns] = useState({});
   const toggleAccordion = (value) => {
     setOpenItems((prev) =>
       prev.includes(value)
@@ -95,8 +96,25 @@ function Input(props) {
     setshowUserInteractionTable(false);
   };
 
-  function inputsToggleChangeHandler(index, InnerIndex) {
+  function inputsToggleChangeHandler(index, InnerIndex, options = {}) {
     setInputs((prevState) => {
+      if (options.isMultiAccountActivity) {
+        const { parentIndex, accountIndex, actIdx } = options;
+        const newInputs = { ...prevState };
+        const item = newInputs.inputs[parentIndex].inputs[InnerIndex];
+        if (
+          item.MultiAccounts &&
+          item.MultiAccounts[accountIndex] &&
+          item.MultiAccounts[accountIndex].activities[actIdx]
+        ) {
+          item.MultiAccounts[accountIndex].activities.forEach(
+            (activity, idx) => {
+              activity.input = idx === actIdx ? !activity.input : false;
+            }
+          );
+        }
+        return newInputs;
+      }
       if (prevState.type === "one") {
         return {
           ...prevState,
@@ -353,7 +371,7 @@ function Input(props) {
     });
   };
 
-  function renderInputContent(el, index, InnerIndex) {
+  function renderInputContent(el, index, InnerIndex, options = {}) {
     // For toggleAndProbability, always set date to today if toggle is on and date is not today
     if (el.type === "toggleAndProbability" && el.input && !isToday(el.date)) {
       setInputs((prevState) => {
@@ -1044,8 +1062,14 @@ function Input(props) {
                               <div className={classes.inputCont}>
                                 {renderInputContent(
                                   input,
-                                  accountIndex,
-                                  inputIndex
+                                  index, // parent input index
+                                  innerIndex, // parent input InnerIndex
+                                  {
+                                    isMultiAccountActivity: true,
+                                    parentIndex: index,
+                                    accountIndex,
+                                    actIdx: inputIndex,
+                                  }
                                 )}
                               </div>
                             </div>
@@ -1065,7 +1089,11 @@ function Input(props) {
           <div className={classes.Inputscontainer}>
             <ToggleInput
               el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
               index={index}
               InnerIndex={InnerIndex}
             />
@@ -1074,38 +1102,69 @@ function Input(props) {
                 <NumberInput
                   lable={"How many profiles?"}
                   onChange={(value) => {
-                    // Initialize posts array if not present or adjust its length
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "numberOfPosts"
-                    );
-                    setInputs((prevState) => {
-                      const newInputs = { ...prevState };
-                      const item = newInputs.inputs[index].inputs[InnerIndex];
-                      let posts = item.posts || [];
-                      const n = parseInt(value) || 0;
-                      if (n > posts.length) {
-                        // Add new empty post objects
-                        posts = posts.concat(
-                          Array(n - posts.length)
-                            .fill()
-                            .map(() => ({
-                              username: "",
-                              numberOfLikes: "",
-                              numberOfComments: "",
-                              numberOfReposts: "",
-                              numberOfQuotes: "",
-                              commentType: "",
-                            }))
-                        );
-                      } else if (n < posts.length) {
-                        posts = posts.slice(0, n);
-                      }
-                      item.posts = posts;
-                      return newInputs;
-                    });
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const activity =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        activity.numberOfPosts = value;
+                        let posts = activity.posts || [];
+                        const n = parseInt(value) || 0;
+                        if (n > posts.length) {
+                          posts = posts.concat(
+                            Array(n - posts.length)
+                              .fill()
+                              .map(() => ({
+                                username: "",
+                                numberOfLikes: "",
+                                numberOfComments: "",
+                                numberOfReposts: "",
+                                numberOfQuotes: "",
+                                commentType: "",
+                              }))
+                          );
+                        } else if (n < posts.length) {
+                          posts = posts.slice(0, n);
+                        }
+                        activity.posts = posts;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "numberOfPosts"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let posts = item.posts || [];
+                        const n = parseInt(value) || 0;
+                        if (n > posts.length) {
+                          posts = posts.concat(
+                            Array(n - posts.length)
+                              .fill()
+                              .map(() => ({
+                                username: "",
+                                numberOfLikes: "",
+                                numberOfComments: "",
+                                numberOfReposts: "",
+                                numberOfQuotes: "",
+                                commentType: "",
+                              }))
+                          );
+                        } else if (n < posts.length) {
+                          posts = posts.slice(0, n);
+                        }
+                        item.posts = posts;
+                        return newInputs;
+                      });
+                    }
                   }}
                   min={0}
                   Value={el.numberOfPosts || ""}
@@ -1139,9 +1198,19 @@ function Input(props) {
                           handler={(val) => {
                             setInputs((prevState) => {
                               const newInputs = { ...prevState };
-                              newInputs.inputs[index].inputs[InnerIndex].posts[
-                                postIdx
-                              ].username = val;
+                              if (options.isMultiAccountActivity) {
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].posts[
+                                  postIdx
+                                ].username = val;
+                              } else {
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].username = val;
+                              }
                               return newInputs;
                             });
                           }}
@@ -1155,9 +1224,19 @@ function Input(props) {
                           onChange={(value) => {
                             setInputs((prevState) => {
                               const newInputs = { ...prevState };
-                              newInputs.inputs[index].inputs[InnerIndex].posts[
-                                postIdx
-                              ].numOfPosts = value;
+                              if (options.isMultiAccountActivity) {
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].posts[
+                                  postIdx
+                                ].numOfPosts = value;
+                              } else {
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].numOfPosts = value;
+                              }
                               return newInputs;
                             });
                           }}
@@ -1176,9 +1255,19 @@ function Input(props) {
                             onChange={(value) => {
                               setInputs((prevState) => {
                                 const newInputs = { ...prevState };
-                                newInputs.inputs[index].inputs[
-                                  InnerIndex
-                                ].posts[postIdx].numberOfLikes = value;
+                                if (options.isMultiAccountActivity) {
+                                  newInputs.inputs[options.parentIndex].inputs[
+                                    InnerIndex
+                                  ].MultiAccounts[
+                                    options.accountIndex
+                                  ].activities[options.actIdx].posts[
+                                    postIdx
+                                  ].numberOfLikes = value;
+                                } else {
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].posts[postIdx].numberOfLikes = value;
+                                }
                                 return newInputs;
                               });
                             }}
@@ -1190,9 +1279,19 @@ function Input(props) {
                             onChange={(value) => {
                               setInputs((prevState) => {
                                 const newInputs = { ...prevState };
-                                newInputs.inputs[index].inputs[
-                                  InnerIndex
-                                ].posts[postIdx].numberOfComments = value;
+                                if (options.isMultiAccountActivity) {
+                                  newInputs.inputs[options.parentIndex].inputs[
+                                    InnerIndex
+                                  ].MultiAccounts[
+                                    options.accountIndex
+                                  ].activities[options.actIdx].posts[
+                                    postIdx
+                                  ].numberOfComments = value;
+                                } else {
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].posts[postIdx].numberOfComments = value;
+                                }
                                 return newInputs;
                               });
                             }}
@@ -1204,9 +1303,19 @@ function Input(props) {
                             onChange={(value) => {
                               setInputs((prevState) => {
                                 const newInputs = { ...prevState };
-                                newInputs.inputs[index].inputs[
-                                  InnerIndex
-                                ].posts[postIdx].numberOfReposts = value;
+                                if (options.isMultiAccountActivity) {
+                                  newInputs.inputs[options.parentIndex].inputs[
+                                    InnerIndex
+                                  ].MultiAccounts[
+                                    options.accountIndex
+                                  ].activities[options.actIdx].posts[
+                                    postIdx
+                                  ].numberOfReposts = value;
+                                } else {
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].posts[postIdx].numberOfReposts = value;
+                                }
                                 return newInputs;
                               });
                             }}
@@ -1218,9 +1327,19 @@ function Input(props) {
                             onChange={(value) => {
                               setInputs((prevState) => {
                                 const newInputs = { ...prevState };
-                                newInputs.inputs[index].inputs[
-                                  InnerIndex
-                                ].posts[postIdx].numberOfQuotes = value;
+                                if (options.isMultiAccountActivity) {
+                                  newInputs.inputs[options.parentIndex].inputs[
+                                    InnerIndex
+                                  ].MultiAccounts[
+                                    options.accountIndex
+                                  ].activities[options.actIdx].posts[
+                                    postIdx
+                                  ].numberOfQuotes = value;
+                                } else {
+                                  newInputs.inputs[index].inputs[
+                                    InnerIndex
+                                  ].posts[postIdx].numberOfQuotes = value;
+                                }
                                 return newInputs;
                               });
                             }}
@@ -1235,9 +1354,19 @@ function Input(props) {
                           handler={(val) => {
                             setInputs((prevState) => {
                               const newInputs = { ...prevState };
-                              newInputs.inputs[index].inputs[InnerIndex].posts[
-                                postIdx
-                              ].commentType = val;
+                              if (options.isMultiAccountActivity) {
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].posts[
+                                  postIdx
+                                ].commentType = val;
+                              } else {
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].posts[postIdx].commentType = val;
+                              }
                               return newInputs;
                             });
                           }}
@@ -1257,22 +1386,75 @@ function Input(props) {
           <div className={classes.Inputscontainer}>
             <ToggleInput
               el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              //inputsToggleChangeHandler={inputsToggleChangeHandler}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
               index={index}
               InnerIndex={InnerIndex}
             />
             {el.input && (
-              <InputText
-                label={"Enter Space Link:"}
-                type={"text"}
-                placeholder={"Place Space Link here"}
-                name={"space_link"}
-                handler={(val) => {
-                  inputTextChangeHandler(index, InnerIndex, val, "space_link");
-                }}
-                isTaskInputs={true}
-                value={el.space_link}
-              />
+              <>
+                <InputText
+                  label={"Enter Space Link:"}
+                  type={"text"}
+                  placeholder={"Place Space Link here"}
+                  name={"space_link"}
+                  // handler={(val) => {
+                  //   inputTextChangeHandler(index, InnerIndex, val, "space_link");
+                  // }}
+                  handler={(val) => {
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        newInputs.inputs[options.parentIndex].inputs[
+                          InnerIndex
+                        ].MultiAccounts[options.accountIndex].activities[
+                          options.actIdx
+                        ].space_link = val;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        val,
+                        "space_link"
+                      );
+                    }
+                  }}
+                  isTaskInputs={true}
+                  value={el.space_link}
+                />
+
+                <NumberInput
+                  lable={"Duration in Space (minutes):"}
+                  onChange={(value) => {
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        newInputs.inputs[options.parentIndex].inputs[
+                          InnerIndex
+                        ].MultiAccounts[options.accountIndex].activities[
+                          options.actIdx
+                        ].space_duration = value;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "space_duration"
+                      );
+                    }
+                  }}
+                  min={1}
+                  Value={el.space_duration || ""}
+                />
+              </>
             )}
           </div>
         );
@@ -1282,7 +1464,12 @@ function Input(props) {
           <div className={classes.Inputscontainer}>
             <ToggleInput
               el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              //inputsToggleChangeHandler={inputsToggleChangeHandler}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
               index={index}
               InnerIndex={InnerIndex}
             />
@@ -1291,35 +1478,67 @@ function Input(props) {
                 <NumberInput
                   lable={"How many Tweets?"}
                   onChange={(value) => {
-                    inputTextChangeHandler(
-                      index,
-                      InnerIndex,
-                      value,
-                      "numberOfTweets"
-                    );
-                    setInputs((prevState) => {
-                      const newInputs = { ...prevState };
-                      const item = newInputs.inputs[index].inputs[InnerIndex];
-                      let tweetData = item.tweetData || [];
-                      const n = parseInt(value) || 0;
-                      if (n > tweetData.length) {
-                        tweetData = tweetData.concat(
-                          Array(n - tweetData.length)
-                            .fill()
-                            .map(() => ({
-                              url: "",
-                              like: false,
-                              comment: false,
-                              repost: false,
-                              quote: false,
-                            }))
-                        );
-                      } else if (n < tweetData.length) {
-                        tweetData = tweetData.slice(0, n);
-                      }
-                      item.tweetData = tweetData;
-                      return newInputs;
-                    });
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const activity =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        activity.numberOfTweets = value;
+                        let tweetData = activity.tweetData || [];
+                        const n = parseInt(value) || 0;
+                        if (n > tweetData.length) {
+                          tweetData = tweetData.concat(
+                            Array(n - tweetData.length)
+                              .fill()
+                              .map(() => ({
+                                url: "",
+                                like: false,
+                                comment: false,
+                                repost: false,
+                                quote: false,
+                              }))
+                          );
+                        } else if (n < tweetData.length) {
+                          tweetData = tweetData.slice(0, n);
+                        }
+                        activity.tweetData = tweetData;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        value,
+                        "numberOfTweets"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let tweetData = item.tweetData || [];
+                        const n = parseInt(value) || 0;
+                        if (n > tweetData.length) {
+                          tweetData = tweetData.concat(
+                            Array(n - tweetData.length)
+                              .fill()
+                              .map(() => ({
+                                url: "",
+                                like: false,
+                                comment: false,
+                                repost: false,
+                                quote: false,
+                              }))
+                          );
+                        } else if (n < tweetData.length) {
+                          tweetData = tweetData.slice(0, n);
+                        }
+                        item.tweetData = tweetData;
+                        return newInputs;
+                      });
+                    }
                   }}
                   min={0}
                   Value={el.numberOfTweets || ""}
@@ -1353,9 +1572,19 @@ function Input(props) {
                           handler={(val) => {
                             setInputs((prevState) => {
                               const newInputs = { ...prevState };
-                              newInputs.inputs[index].inputs[
-                                InnerIndex
-                              ].tweetData[idx].url = val;
+                              if (options.isMultiAccountActivity) {
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].tweetData[
+                                  idx
+                                ].url = val;
+                              } else {
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].tweetData[idx].url = val;
+                              }
                               return newInputs;
                             });
                           }}
@@ -1383,9 +1612,19 @@ function Input(props) {
                               onChange={(e) => {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
-                                  newInputs.inputs[index].inputs[
-                                    InnerIndex
-                                  ].tweetData[idx].like = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    newInputs.inputs[
+                                      options.parentIndex
+                                    ].inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx].tweetData[
+                                      idx
+                                    ].like = e.target.checked;
+                                  } else {
+                                    newInputs.inputs[index].inputs[
+                                      InnerIndex
+                                    ].tweetData[idx].like = e.target.checked;
+                                  }
                                   return newInputs;
                                 });
                               }}
@@ -1406,9 +1645,19 @@ function Input(props) {
                               onChange={(e) => {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
-                                  newInputs.inputs[index].inputs[
-                                    InnerIndex
-                                  ].tweetData[idx].comment = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    newInputs.inputs[
+                                      options.parentIndex
+                                    ].inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx].tweetData[
+                                      idx
+                                    ].comment = e.target.checked;
+                                  } else {
+                                    newInputs.inputs[index].inputs[
+                                      InnerIndex
+                                    ].tweetData[idx].comment = e.target.checked;
+                                  }
                                   return newInputs;
                                 });
                               }}
@@ -1429,9 +1678,19 @@ function Input(props) {
                               onChange={(e) => {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
-                                  newInputs.inputs[index].inputs[
-                                    InnerIndex
-                                  ].tweetData[idx].repost = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    newInputs.inputs[
+                                      options.parentIndex
+                                    ].inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx].tweetData[
+                                      idx
+                                    ].repost = e.target.checked;
+                                  } else {
+                                    newInputs.inputs[index].inputs[
+                                      InnerIndex
+                                    ].tweetData[idx].repost = e.target.checked;
+                                  }
                                   return newInputs;
                                 });
                               }}
@@ -1452,9 +1711,19 @@ function Input(props) {
                               onChange={(e) => {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
-                                  newInputs.inputs[index].inputs[
-                                    InnerIndex
-                                  ].tweetData[idx].quote = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    newInputs.inputs[
+                                      options.parentIndex
+                                    ].inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx].tweetData[
+                                      idx
+                                    ].quote = e.target.checked;
+                                  } else {
+                                    newInputs.inputs[index].inputs[
+                                      InnerIndex
+                                    ].tweetData[idx].quote = e.target.checked;
+                                  }
                                   return newInputs;
                                 });
                               }}
@@ -1473,9 +1742,19 @@ function Input(props) {
                               handler={(val) => {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
-                                  newInputs.inputs[index].inputs[
-                                    InnerIndex
-                                  ].tweetData[idx].commentPrompt = val;
+                                  if (options.isMultiAccountActivity) {
+                                    newInputs.inputs[
+                                      options.parentIndex
+                                    ].inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx].tweetData[
+                                      idx
+                                    ].commentPrompt = val;
+                                  } else {
+                                    newInputs.inputs[index].inputs[
+                                      InnerIndex
+                                    ].tweetData[idx].commentPrompt = val;
+                                  }
                                   return newInputs;
                                 });
                               }}
@@ -1498,7 +1777,12 @@ function Input(props) {
           <div className={classes.Inputscontainer}>
             <ToggleInput
               el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              //inputsToggleChangeHandler={inputsToggleChangeHandler}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
               index={index}
               InnerIndex={InnerIndex}
             />
@@ -1508,12 +1792,204 @@ function Input(props) {
                 type={"text"}
                 placeholder={"Place Prompt here"}
                 name={"prompt"}
+                // handler={(val) => {
+                //   inputTextChangeHandler(index, InnerIndex, val, "prompt");
+                // }}
                 handler={(val) => {
-                  inputTextChangeHandler(index, InnerIndex, val, "prompt");
+                  if (options.isMultiAccountActivity) {
+                    setInputs((prevState) => {
+                      const newInputs = { ...prevState };
+                      newInputs.inputs[options.parentIndex].inputs[
+                        InnerIndex
+                      ].MultiAccounts[options.accountIndex].activities[
+                        options.actIdx
+                      ].prompt = val;
+                      return newInputs;
+                    });
+                  } else {
+                    inputTextChangeHandler(index, InnerIndex, val, "prompt");
+                  }
                 }}
                 isTaskInputs={true}
                 value={el.prompt}
               />
+            )}
+          </div>
+        );
+      case "toggleAndMultiAccounts":
+        return (
+          <div className={classes.Inputscontainer}>
+            {/* Main toggle for MultiAccounts uses parent indices */}
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <div className={classes.addbuttonInputContainer}>
+                  <InputWithButton
+                    lable={"Enter Username"}
+                    type="text"
+                    name="accountUsername"
+                    buttonText="Add"
+                    handler={(value) => {
+                      if (value.trim() === "") {
+                        failToast("Please enter username");
+                        return;
+                      } else if (
+                        el.MultiAccounts.some(
+                          (acc) => acc.username === value.trim()
+                        )
+                      ) {
+                        failToast("Username already exists");
+                        return;
+                      } else {
+                        setInputs((prev) => {
+                          const newInputs = { ...prev };
+                          const item =
+                            newInputs.inputs[index].inputs[InnerIndex];
+                          item.MultiAccounts = [
+                            ...(item.MultiAccounts || []),
+                            {
+                              username: value.trim(),
+                              activities: [
+                                {
+                                  type: "toggleAndInput",
+                                  name: "Profile interaction using Usernames",
+                                  description:
+                                    "The bot will search for the specific usernames and interact with the posts of the profile.",
+                                  input: false,
+                                  posts: [],
+                                  numberOfPosts: 0,
+                                },
+                                {
+                                  type: "toggleAndURL",
+                                  name: "Join the Twitter Space",
+                                  description:
+                                    "The bot will join the Twitter Space using the URL.",
+                                  input: false,
+                                  space_link: "",
+                                },
+                                {
+                                  type: "toggleAndPrompt",
+                                  name: "Post a new Tweet",
+                                  description:
+                                    "The bot will type and post a new Tweet using a prompt.",
+                                  input: false,
+                                  prompt: "",
+                                },
+                                {
+                                  type: "toggleAndRetweet",
+                                  name: "Interact with specific Tweets",
+                                  description:
+                                    "The bot will interact with the specific Tweets using the URLs.",
+                                  input: false,
+                                  tweetData: [],
+                                  numberOfTweets: 0,
+                                },
+                              ],
+                            },
+                          ];
+                          return newInputs;
+                        });
+                      }
+                    }}
+                  />
+                </div>
+                {el.MultiAccounts && el.MultiAccounts.length !== 0 && (
+                  <>
+                    {el.MultiAccounts.map((account, accountIndex) => {
+                      const isOpen = openDropdowns[accountIndex];
+                      return (
+                        <div
+                          className={classes.accountContainer}
+                          key={accountIndex}
+                        >
+                          <div className={classes.accountHeaderContainer}>
+                            <h6 className={classes.accountUsername}>
+                              {account.username}
+                            </h6>
+                            <div className={classes.accountActions}>
+                              <button
+                                className={classes.removeAccountBtn}
+                                onClick={() => {
+                                  setInputs((prev) => {
+                                    const newInputs = { ...prev };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.MultiAccounts =
+                                      item.MultiAccounts.filter(
+                                        (_, i) => i !== accountIndex
+                                      );
+                                    return newInputs;
+                                  });
+                                }}
+                                aria-label="Remove account"
+                              >
+                                {/* Use your Cross icon component if available */}
+                                <Cross />
+                              </button>
+                              <button
+                                className={`${classes.accordionButton} ${
+                                  isOpen ? classes.opened : ""
+                                }`}
+                                onClick={() => {
+                                  setOpenDropdowns((prev) => ({
+                                    ...prev,
+                                    [accountIndex]: !prev[accountIndex],
+                                  }));
+                                }}
+                                aria-label={isOpen ? "Collapse" : "Expand"}
+                              >
+                                {isOpen ? (
+                                  <CustomChevronUp />
+                                ) : (
+                                  <CustomChevronDown />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                          {isOpen && (
+                            <div className={classes.accordionContent}>
+                              <p className={classes.setInputsHeading}>
+                                Please set Inputs for this account:
+                              </p>
+                              {account.activities.map((activity, actIdx) => (
+                                <div
+                                  key={actIdx}
+                                  className={classes.inputWrapper}
+                                >
+                                  <div className={classes.descriptionContainer}>
+                                    <p>{activity.description}</p>
+                                  </div>
+                                  <div className={classes.inputCont}>
+                                    {/* Activity toggles use accountIndex and actIdx for correct state */}
+                                    {renderInputContent(
+                                      activity,
+                                      index,
+                                      InnerIndex,
+                                      {
+                                        isMultiAccountActivity: true,
+                                        parentIndex: index,
+                                        accountIndex,
+                                        actIdx,
+                                      }
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </>
             )}
           </div>
         );
