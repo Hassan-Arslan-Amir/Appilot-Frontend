@@ -527,7 +527,7 @@ export function transformData(data) {
 
       toggleAndInput: ["posts", "numberOfPosts"],
 
-      toggleAndURL: ["space_link"],
+      toggleAndURL: ["space_link", "space_duration"],
 
       toggleAndAPI: ["api_key"],
 
@@ -538,6 +538,8 @@ export function transformData(data) {
       toggleAndFollowUnfollow: ["usernames", "usersPerDay", "followAction"],
 
       toggleAndRetweet: ["tweetData"],
+
+      toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today

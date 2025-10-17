@@ -28,6 +28,7 @@ function Save({ task, saveHandler, devicesNavigator, disabled }) {
       case "toggleandretweet":
       case "toggleandapi":
       case "toggleandprobability":
+      case "toggleandmultiaccounts":
         return el.input ? <Tick class="greenCheck" /> : <Cut class="redCut" />;
       default:
         return String(el.input);
