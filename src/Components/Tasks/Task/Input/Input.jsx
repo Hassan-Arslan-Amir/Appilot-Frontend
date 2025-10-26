@@ -1816,6 +1816,396 @@ function Input(props) {
             )}
           </div>
         );
+
+      case "toggleAndYoutube":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                {/* Number of YouTube videos to interact with */}
+                <NumberInput
+                  lable={"How many YouTube videos?"}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 0;
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const activity =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        let videos = Array.isArray(activity.videos)
+                          ? activity.videos
+                          : [];
+                        if (n > videos.length) {
+                          for (let i = videos.length; i < n; i++) {
+                            videos.push({ youtube_link: "", prompt: "" });
+                          }
+                        } else if (n < videos.length) {
+                          videos = videos.slice(0, n);
+                        }
+                        activity.videos = videos;
+                        activity.numberOfVideos = n;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        n,
+                        "numberOfVideos"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let videos = Array.isArray(item.videos)
+                          ? item.videos
+                          : [];
+                        if (n > videos.length) {
+                          for (let i = videos.length; i < n; i++) {
+                            videos.push({ youtube_link: "", prompt: "" });
+                          }
+                        } else if (n < videos.length) {
+                          videos = videos.slice(0, n);
+                        }
+                        item.videos = videos;
+                        item.numberOfVideos = n;
+                        return newInputs;
+                      });
+                    }
+                  }}
+                  min={0}
+                  Value={el.numberOfVideos || ""}
+                />
+
+                {Array.isArray(el.videos) && el.videos.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {el.videos.map((video, vIdx) => (
+                      <div
+                        key={vIdx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 8,
+                            fontWeight: 500,
+                            color: "#fff",
+                          }}
+                        >
+                          Video #{vIdx + 1}
+                        </div>
+                        <InputText
+                          label={"YouTube URL:"}
+                          type={"text"}
+                          placeholder={"Enter YouTube video URL"}
+                          name={`youtube_link_${vIdx}`}
+                          handler={(val) => {
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].videos[
+                                  vIdx
+                                ].youtube_link = val;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].videos[vIdx].youtube_link = val;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          isTaskInputs={true}
+                          value={video.youtube_link}
+                        />
+                        <NumberInput
+                          lable={"Play duration (minutes):"}
+                          placeholder={"Enter play duration in minutes"}
+                          onChange={(value) => {
+                            const v = parseInt(value) || 0;
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].videos[
+                                  vIdx
+                                ].playDuration = v;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].videos[vIdx].playDuration = v;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          min={0}
+                          Value={video.playDuration || ""}
+                        />
+                        <InputText
+                          label={"Prompt / Notes:"}
+                          type={"text"}
+                          placeholder={"Enter prompt or instructions"}
+                          name={`youtube_prompt_${vIdx}`}
+                          handler={(val) => {
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].videos[
+                                  vIdx
+                                ].prompt = val;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].videos[vIdx].prompt = val;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          isTaskInputs={true}
+                          value={video.prompt || ""}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+
+      case "toggleAndSpotify":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                {/* Number of albums to interact with */}
+                <NumberInput
+                  lable={"How many Spotify albums?"}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 0;
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        let albums = Array.isArray(item.albums)
+                          ? item.albums
+                          : [];
+                        if (n > albums.length) {
+                          for (let i = albums.length; i < n; i++) {
+                            albums.push({ spotify_link: "", prompt: "" });
+                          }
+                        } else if (n < albums.length) {
+                          albums = albums.slice(0, n);
+                        }
+                        item.albums = albums;
+                        item.numberOfAlbums = n;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        n,
+                        "numberOfAlbums"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let albums = Array.isArray(item.albums)
+                          ? item.albums
+                          : [];
+                        if (n > albums.length) {
+                          for (let i = albums.length; i < n; i++) {
+                            albums.push({ spotify_link: "", prompt: "" });
+                          }
+                        } else if (n < albums.length) {
+                          albums = albums.slice(0, n);
+                        }
+                        item.albums = albums;
+                        item.numberOfAlbums = n;
+                        return newInputs;
+                      });
+                    }
+                  }}
+                  min={0}
+                  Value={el.numberOfAlbums || ""}
+                />
+                {Array.isArray(el.albums) && el.albums.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {el.albums.map((album, aIdx) => (
+                      <div
+                        key={aIdx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 8,
+                            fontWeight: 500,
+                            color: "#fff",
+                          }}
+                        >
+                          Album #{aIdx + 1}
+                        </div>
+                        <InputText
+                          label={"Album URL:"}
+                          type={"text"}
+                          placeholder={"Enter Spotify album URL"}
+                          name={`spotify_link_${aIdx}`}
+                          handler={(val) => {
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].albums[
+                                  aIdx
+                                ].spotify_link = val;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].albums[aIdx].spotify_link = val;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          isTaskInputs={true}
+                          value={album.spotify_link}
+                        />
+                        <NumberInput
+                          lable={"Play duration (minutes):"}
+                          placeholder={"Enter play duration in minutes"}
+                          onChange={(value) => {
+                            const v = parseInt(value) || 0;
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].albums[
+                                  aIdx
+                                ].playDuration = v;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].albums[aIdx].playDuration = v;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          min={0}
+                          Value={album.playDuration || ""}
+                        />
+                        <InputText
+                          label={"Prompt / Notes:"}
+                          type={"text"}
+                          placeholder={"Enter prompt or instructions"}
+                          name={`spotify_prompt_${aIdx}`}
+                          handler={(val) => {
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[options.parentIndex].inputs[
+                                  InnerIndex
+                                ].MultiAccounts[
+                                  options.accountIndex
+                                ].activities[options.actIdx].albums[
+                                  aIdx
+                                ].prompt = val;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                newInputs.inputs[index].inputs[
+                                  InnerIndex
+                                ].albums[aIdx].prompt = val;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          isTaskInputs={true}
+                          value={album.prompt || ""}
+                        />
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+
       case "toggleAndMultiAccounts":
         return (
           <div className={classes.Inputscontainer}>
@@ -1871,6 +2261,7 @@ function Input(props) {
                                     "The bot will join the Twitter Space using the URL.",
                                   input: false,
                                   space_link: "",
+                                  space_duration: 5,
                                 },
                                 {
                                   type: "toggleAndPrompt",
@@ -1889,6 +2280,24 @@ function Input(props) {
                                   tweetData: [],
                                   numberOfTweets: 0,
                                 },
+                                // {
+                                //   type: "toggleAndYoutube",
+                                //   name: "Interact and Share a YouTube video",
+                                //   description:
+                                //     "The bot will interact with a YouTube video using a URL and share the link by posting a new tweet.",
+                                //   input: false,
+                                //   youtube_link: "",
+                                //   prompt: "",
+                                // },
+                                // {
+                                //   type: "toggleAndSpotify",
+                                //   name: "Interact and Share a Spotify track",
+                                //   description:
+                                //     "The bot will interact with a Spotify track using a URL and share the link by posting a new tweet.",
+                                //   input: false,
+                                //   spotify_link: "",
+                                //   prompt: "",
+                                // },
                               ],
                             },
                           ];
