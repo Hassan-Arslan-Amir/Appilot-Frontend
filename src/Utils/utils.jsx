@@ -539,6 +539,10 @@ export function transformData(data) {
 
       toggleAndRetweet: ["tweetData"],
 
+      toggleAndYoutube: ["videos", "numberOfVideos"],
+
+      toggleAndSpotify: ["albums", "numberOfAlbums"],
+
       toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
     };
 
