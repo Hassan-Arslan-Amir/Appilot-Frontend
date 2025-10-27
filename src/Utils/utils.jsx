@@ -138,6 +138,28 @@ export function schedulingInputsValidater(el) {
         return false;
       }
       return true;
+
+    case "MultipleRunTimes":
+      if (!el.numberOfRuns || el.numberOfRuns < 1) {
+        failToast("Please enter how many times to run.");
+        return false;
+      }
+      if (
+        !Array.isArray(el.runStartTimes) ||
+        el.runStartTimes.length !== el.numberOfRuns
+      ) {
+        failToast("Please set all start times.");
+        return false;
+      }
+      if (
+        el.runStartTimes.some(
+          (t) => !t || typeof t !== "string" || t.trim() === ""
+        )
+      ) {
+        failToast("All start times must be set.");
+        return false;
+      }
+      return true;
   }
 }
 
@@ -459,6 +481,26 @@ export function renderSchedule(inputs) {
             schedule.endinput || "Not set"
           }`}
         />
+      )}
+      {schedule.type === "MultipleRunTimes" && (
+        <>
+          <OptionDisplay
+            name="Number of Runs"
+            value={schedule.numberOfRuns || 0}
+          />
+          {Array.isArray(schedule.runStartTimes) &&
+          schedule.runStartTimes.length > 0 ? (
+            schedule.runStartTimes.map((runTime, runIdx) => (
+              <OptionDisplay
+                key={runIdx}
+                name={`Run ${runIdx + 1} -> Start Time`}
+                value={runTime || "Not set"}
+              />
+            ))
+          ) : (
+            <OptionDisplay name="Run Times" value="Not set" />
+          )}
+        </>
       )}
     </ScheduleSection>
   ));
