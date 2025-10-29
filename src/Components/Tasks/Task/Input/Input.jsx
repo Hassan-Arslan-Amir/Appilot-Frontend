@@ -122,15 +122,15 @@ function Input(props) {
             i === index
               ? {
                   ...item,
-                  inputs: item.inputs.map((el) => {
-                    return { ...el, input: !el.input };
-                  }),
+                  inputs: item.inputs.map((el, innerI) =>
+                    innerI === InnerIndex
+                      ? { ...el, input: !el.input }
+                      : { ...el, input: false }
+                  ),
                 }
               : {
                   ...item,
-                  inputs: item.inputs.map((el) => {
-                    return { ...el, input: false };
-                  }),
+                  inputs: item.inputs.map((el) => ({ ...el, input: false })),
                 }
           ),
         };
@@ -1083,7 +1083,7 @@ function Input(props) {
             )}
           </div>
         );
-      // Inputs for the Twitter Bot
+      //--------------------------------- Inputs for the Twitter Bot -----------------------------------//
       case "toggleAndInput":
         return (
           <div className={classes.Inputscontainer}>
@@ -1771,7 +1771,6 @@ function Input(props) {
             )}
           </div>
         );
-
       case "toggleAndPrompt":
         return (
           <div className={classes.Inputscontainer}>
@@ -2412,7 +2411,6 @@ function Input(props) {
             )}
           </div>
         );
-
       case "toggleAndSpotify":
         return (
           <div className={classes.Inputscontainer}>
@@ -2770,7 +2768,6 @@ function Input(props) {
             )}
           </div>
         );
-
       case "toggleAndMultiAccounts":
         return (
           <div className={classes.Inputscontainer}>
@@ -3126,13 +3123,134 @@ function Input(props) {
       //     </div>
       //   );
 
+      // ------------------ Inputs for Telegram Bot -----------------------------------//
+      // case "telegramToggleAndURL":
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       <ToggleInput
+      //         el={el}
+      //         inputsToggleChangeHandler={(idx, innerIdx) =>
+      //           options.isMultiAccountActivity
+      //             ? inputsToggleChangeHandler(idx, innerIdx, options)
+      //             : inputsToggleChangeHandler(idx, innerIdx)
+      //         }
+      //         index={index}
+      //         InnerIndex={InnerIndex}
+      //       />
+      //       {el.input && (
+      //         <>
+      //           {/* Number of groups to join */}
+      //           <NumberInput
+      //             lable={"How many Telegram groups?"}
+      //             min={0}
+      //             Value={el.numberOfGroups || 0}
+      //             onChange={(value) => {
+      //               const n = parseInt(value) || 0;
+      //               if (options.isMultiAccountActivity) {
+      //                 setInputs((prevState) => {
+      //                   const newInputs = { ...prevState };
+      //                   const activity =
+      //                     newInputs.inputs[options.parentIndex].inputs[
+      //                       InnerIndex
+      //                     ].MultiAccounts[options.accountIndex].activities[
+      //                       options.actIdx
+      //                     ];
+      //                   let urls = Array.isArray(activity.telegram_group_urls)
+      //                     ? activity.telegram_group_urls
+      //                     : [];
+      //                   if (n > urls.length) {
+      //                     for (let i = urls.length; i < n; i++) urls.push("");
+      //                   } else if (n < urls.length) {
+      //                     urls = urls.slice(0, n);
+      //                   }
+      //                   activity.telegram_group_urls = urls;
+      //                   activity.numberOfGroups = n;
+      //                   return newInputs;
+      //                 });
+      //               } else {
+      //                 inputTextChangeHandler(
+      //                   index,
+      //                   InnerIndex,
+      //                   n,
+      //                   "numberOfGroups"
+      //                 );
+      //                 setInputs((prevState) => {
+      //                   const newInputs = { ...prevState };
+      //                   const item = newInputs.inputs[index].inputs[InnerIndex];
+      //                   let urls = Array.isArray(item.telegram_group_urls)
+      //                     ? item.telegram_group_urls
+      //                     : [];
+      //                   if (n > urls.length) {
+      //                     for (let i = urls.length; i < n; i++) urls.push("");
+      //                   } else if (n < urls.length) {
+      //                     urls = urls.slice(0, n);
+      //                   }
+      //                   item.telegram_group_urls = urls;
+      //                   item.numberOfGroups = n;
+      //                   return newInputs;
+      //                 });
+      //               }
+      //             }}
+      //           />
+      //           {/* Render group URL input fields */}
+      //           {Array.isArray(el.telegram_group_urls) &&
+      //             el.telegram_group_urls.length > 0 && (
+      //               <div style={{ marginTop: 0 }}>
+      //                 {el.telegram_group_urls.map((url, gIdx) => (
+      //                   <InputText
+      //                     key={gIdx}
+      //                     label={`Group URL #${gIdx + 1}`}
+      //                     type="text"
+      //                     placeholder="Enter Telegram group URL"
+      //                     name={`telegram_group_url_${gIdx}`}
+      //                     handler={(val) => {
+      //                       if (options.isMultiAccountActivity) {
+      //                         setInputs((prevState) => {
+      //                           const newInputs = { ...prevState };
+      //                           const activity =
+      //                             newInputs.inputs[options.parentIndex].inputs[
+      //                               InnerIndex
+      //                             ].MultiAccounts[options.accountIndex]
+      //                               .activities[options.actIdx];
+      //                           activity.telegram_group_urls = Array.isArray(
+      //                             activity.telegram_group_urls
+      //                           )
+      //                             ? activity.telegram_group_urls
+      //                             : [];
+      //                           activity.telegram_group_urls[gIdx] = val;
+      //                           return newInputs;
+      //                         });
+      //                       } else {
+      //                         setInputs((prevState) => {
+      //                           const newInputs = { ...prevState };
+      //                           const item =
+      //                             newInputs.inputs[index].inputs[InnerIndex];
+      //                           item.telegram_group_urls = Array.isArray(
+      //                             item.telegram_group_urls
+      //                           )
+      //                             ? item.telegram_group_urls
+      //                             : [];
+      //                           item.telegram_group_urls[gIdx] = val;
+      //                           return newInputs;
+      //                         });
+      //                       }
+      //                     }}
+      //                     isTaskInputs={true}
+      //                     value={url}
+      //                   />
+      //                 ))}
+      //               </div>
+      //             )}
+      //         </>
+      //       )}
+      //     </div>
+      //   );
       default:
         return <p>Unknown input type</p>;
     }
   }
   return (
     inputs && (
-      // inputs?.inputs?.lenght > 0 && (
       <div className={classes.main}>
         <div className={classes.inputsContainer}>
           {inputs.inputs.map((el, index) => {

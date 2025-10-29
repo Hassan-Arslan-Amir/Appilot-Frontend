@@ -586,6 +586,8 @@ export function transformData(data) {
       toggleAndSpotify: ["albums", "numberOfAlbums"],
 
       toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
+
+      telegramToggleAndURL: ["telegram_group_urls"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today
