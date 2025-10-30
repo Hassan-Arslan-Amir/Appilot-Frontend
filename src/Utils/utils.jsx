@@ -588,6 +588,8 @@ export function transformData(data) {
       toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
 
       telegramToggleAndURL: ["telegram_group_urls"],
+
+      telegramToggleAndPost: ["messages"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today
