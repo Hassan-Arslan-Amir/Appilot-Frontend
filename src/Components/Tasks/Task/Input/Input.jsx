@@ -3124,7 +3124,128 @@ function Input(props) {
       //   );
 
       // ------------------ Inputs for Telegram Bot -----------------------------------//
-      // case "telegramToggleAndURL":
+      case "telegramToggleAndURL":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                {/* Number of groups to join */}
+                <NumberInput
+                  lable={"How many Telegram groups?"}
+                  min={0}
+                  Value={el.numberOfGroups || 0}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 0;
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const activity =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        let urls = Array.isArray(activity.telegram_group_urls)
+                          ? activity.telegram_group_urls
+                          : [];
+                        if (n > urls.length) {
+                          for (let i = urls.length; i < n; i++) urls.push("");
+                        } else if (n < urls.length) {
+                          urls = urls.slice(0, n);
+                        }
+                        activity.telegram_group_urls = urls;
+                        activity.numberOfGroups = n;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        n,
+                        "numberOfGroups"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let urls = Array.isArray(item.telegram_group_urls)
+                          ? item.telegram_group_urls
+                          : [];
+                        if (n > urls.length) {
+                          for (let i = urls.length; i < n; i++) urls.push("");
+                        } else if (n < urls.length) {
+                          urls = urls.slice(0, n);
+                        }
+                        item.telegram_group_urls = urls;
+                        item.numberOfGroups = n;
+                        return newInputs;
+                      });
+                    }
+                  }}
+                />
+                {/* Render group URL input fields */}
+                {Array.isArray(el.telegram_group_urls) &&
+                  el.telegram_group_urls.length > 0 && (
+                    <div style={{ marginTop: 0 }}>
+                      {el.telegram_group_urls.map((url, gIdx) => (
+                        <InputText
+                          key={gIdx}
+                          label={`Group URL #${gIdx + 1}`}
+                          type="text"
+                          placeholder="Enter Telegram group URL"
+                          name={`telegram_group_url_${gIdx}`}
+                          handler={(val) => {
+                            if (options.isMultiAccountActivity) {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                const activity =
+                                  newInputs.inputs[options.parentIndex].inputs[
+                                    InnerIndex
+                                  ].MultiAccounts[options.accountIndex]
+                                    .activities[options.actIdx];
+                                activity.telegram_group_urls = Array.isArray(
+                                  activity.telegram_group_urls
+                                )
+                                  ? activity.telegram_group_urls
+                                  : [];
+                                activity.telegram_group_urls[gIdx] = val;
+                                return newInputs;
+                              });
+                            } else {
+                              setInputs((prevState) => {
+                                const newInputs = { ...prevState };
+                                const item =
+                                  newInputs.inputs[index].inputs[InnerIndex];
+                                item.telegram_group_urls = Array.isArray(
+                                  item.telegram_group_urls
+                                )
+                                  ? item.telegram_group_urls
+                                  : [];
+                                item.telegram_group_urls[gIdx] = val;
+                                return newInputs;
+                              });
+                            }
+                          }}
+                          isTaskInputs={true}
+                          value={url}
+                        />
+                      ))}
+                    </div>
+                  )}
+              </>
+            )}
+          </div>
+        );
+      // case "telegramToggleAndPost":
       //   return (
       //     <div className={classes.Inputscontainer}>
       //       <ToggleInput
@@ -3139,108 +3260,266 @@ function Input(props) {
       //       />
       //       {el.input && (
       //         <>
-      //           {/* Number of groups to join */}
       //           <NumberInput
-      //             lable={"How many Telegram groups?"}
+      //             lable={"How many messages/posts to interact?"}
       //             min={0}
-      //             Value={el.numberOfGroups || 0}
+      //             Value={el.numberOfMessages || 0}
       //             onChange={(value) => {
       //               const n = parseInt(value) || 0;
-      //               if (options.isMultiAccountActivity) {
-      //                 setInputs((prevState) => {
-      //                   const newInputs = { ...prevState };
-      //                   const activity =
-      //                     newInputs.inputs[options.parentIndex].inputs[
-      //                       InnerIndex
-      //                     ].MultiAccounts[options.accountIndex].activities[
-      //                       options.actIdx
-      //                     ];
-      //                   let urls = Array.isArray(activity.telegram_group_urls)
-      //                     ? activity.telegram_group_urls
-      //                     : [];
-      //                   if (n > urls.length) {
-      //                     for (let i = urls.length; i < n; i++) urls.push("");
-      //                   } else if (n < urls.length) {
-      //                     urls = urls.slice(0, n);
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 n,
+      //                 "numberOfMessages"
+      //               );
+      //               setInputs((prevState) => {
+      //                 const newInputs = { ...prevState };
+      //                 const item = newInputs.inputs[index].inputs[InnerIndex];
+      //                 let messages = Array.isArray(item.messages)
+      //                   ? item.messages
+      //                   : [];
+      //                 if (n > messages.length) {
+      //                   for (let i = messages.length; i < n; i++) {
+      //                     messages.push({
+      //                       url: "",
+      //                       like: false,
+      //                       comment: false,
+      //                       share: false,
+      //                     });
       //                   }
-      //                   activity.telegram_group_urls = urls;
-      //                   activity.numberOfGroups = n;
-      //                   return newInputs;
-      //                 });
-      //               } else {
-      //                 inputTextChangeHandler(
-      //                   index,
-      //                   InnerIndex,
-      //                   n,
-      //                   "numberOfGroups"
-      //                 );
-      //                 setInputs((prevState) => {
-      //                   const newInputs = { ...prevState };
-      //                   const item = newInputs.inputs[index].inputs[InnerIndex];
-      //                   let urls = Array.isArray(item.telegram_group_urls)
-      //                     ? item.telegram_group_urls
-      //                     : [];
-      //                   if (n > urls.length) {
-      //                     for (let i = urls.length; i < n; i++) urls.push("");
-      //                   } else if (n < urls.length) {
-      //                     urls = urls.slice(0, n);
-      //                   }
-      //                   item.telegram_group_urls = urls;
-      //                   item.numberOfGroups = n;
-      //                   return newInputs;
-      //                 });
-      //               }
+      //                 } else if (n < messages.length) {
+      //                   messages = messages.slice(0, n);
+      //                 }
+      //                 item.messages = messages;
+      //                 item.numberOfMessages = n;
+      //                 return newInputs;
+      //               });
       //             }}
       //           />
-      //           {/* Render group URL input fields */}
-      //           {Array.isArray(el.telegram_group_urls) &&
-      //             el.telegram_group_urls.length > 0 && (
-      //               <div style={{ marginTop: 0 }}>
-      //                 {el.telegram_group_urls.map((url, gIdx) => (
+      //           {Array.isArray(el.messages) && el.messages.length > 0 && (
+      //             <div style={{ marginTop: 12 }}>
+      //               {el.messages.map((msg, mIdx) => (
+      //                 <div
+      //                   key={mIdx}
+      //                   style={{
+      //                     border: "1px solid #444",
+      //                     borderRadius: 8,
+      //                     padding: 12,
+      //                     marginBottom: 12,
+      //                   }}
+      //                 >
+      //                   <div
+      //                     style={{
+      //                       marginBottom: 8,
+      //                       fontWeight: 500,
+      //                       color: "#fff",
+      //                     }}
+      //                   >
+      //                     Message #{mIdx + 1}
+      //                   </div>
       //                   <InputText
-      //                     key={gIdx}
-      //                     label={`Group URL #${gIdx + 1}`}
-      //                     type="text"
-      //                     placeholder="Enter Telegram group URL"
-      //                     name={`telegram_group_url_${gIdx}`}
+      //                     label={"Message/URL:"}
+      //                     type={"text"}
+      //                     placeholder={"Enter message or URL to interact"}
+      //                     name={`message_url_${mIdx}`}
       //                     handler={(val) => {
-      //                       if (options.isMultiAccountActivity) {
-      //                         setInputs((prevState) => {
-      //                           const newInputs = { ...prevState };
-      //                           const activity =
-      //                             newInputs.inputs[options.parentIndex].inputs[
-      //                               InnerIndex
-      //                             ].MultiAccounts[options.accountIndex]
-      //                               .activities[options.actIdx];
-      //                           activity.telegram_group_urls = Array.isArray(
-      //                             activity.telegram_group_urls
-      //                           )
-      //                             ? activity.telegram_group_urls
-      //                             : [];
-      //                           activity.telegram_group_urls[gIdx] = val;
-      //                           return newInputs;
-      //                         });
-      //                       } else {
+      //                       setInputs((prevState) => {
+      //                         const newInputs = { ...prevState };
+      //                         const item =
+      //                           newInputs.inputs[index].inputs[InnerIndex];
+      //                         item.messages = Array.isArray(item.messages)
+      //                           ? item.messages
+      //                           : [];
+      //                         item.messages[mIdx] = item.messages[mIdx] || {
+      //                           url: "",
+      //                           like: false,
+      //                           comment: false,
+      //                           share: false,
+      //                           reply: "",
+      //                           shareGroups: "",
+      //                         };
+      //                         item.messages[mIdx].url = val;
+      //                         return newInputs;
+      //                       });
+      //                     }}
+      //                     isTaskInputs={true}
+      //                     value={msg.url || ""}
+      //                   />
+      //                   <div style={{ display: "flex", gap: 24, marginTop: 8 }}>
+      //                     <label
+      //                       style={{
+      //                         color: "#fff",
+      //                         display: "flex",
+      //                         alignItems: "center",
+      //                         gap: 8,
+      //                       }}
+      //                     >
+      //                       <input
+      //                         type="checkbox"
+      //                         checked={!!msg.like}
+      //                         onChange={(e) => {
+      //                           const checked = e.target.checked;
+      //                           setInputs((prevState) => {
+      //                             const newInputs = { ...prevState };
+      //                             const item =
+      //                               newInputs.inputs[index].inputs[InnerIndex];
+      //                             item.messages = Array.isArray(item.messages)
+      //                               ? item.messages
+      //                               : [];
+      //                             item.messages[mIdx] = item.messages[mIdx] || {
+      //                               url: "",
+      //                               like: false,
+      //                               comment: false,
+      //                               share: false,
+      //                               reply: "",
+      //                               shareGroups: "",
+      //                             };
+      //                             item.messages[mIdx].like = checked;
+      //                             return newInputs;
+      //                           });
+      //                         }}
+      //                       />
+      //                       Like
+      //                     </label>
+      //                     <label
+      //                       style={{
+      //                         color: "#fff",
+      //                         display: "flex",
+      //                         alignItems: "center",
+      //                         gap: 8,
+      //                       }}
+      //                     >
+      //                       <input
+      //                         type="checkbox"
+      //                         checked={!!msg.comment}
+      //                         onChange={(e) => {
+      //                           const checked = e.target.checked;
+      //                           setInputs((prevState) => {
+      //                             const newInputs = { ...prevState };
+      //                             const item =
+      //                               newInputs.inputs[index].inputs[InnerIndex];
+      //                             item.messages = Array.isArray(item.messages)
+      //                               ? item.messages
+      //                               : [];
+      //                             item.messages[mIdx] = item.messages[mIdx] || {
+      //                               url: "",
+      //                               like: false,
+      //                               comment: false,
+      //                               share: false,
+      //                               reply: "",
+      //                               shareGroups: "",
+      //                             };
+      //                             item.messages[mIdx].comment = checked;
+      //                             return newInputs;
+      //                           });
+      //                         }}
+      //                       />
+      //                       Comment
+      //                     </label>
+      //                     <label
+      //                       style={{
+      //                         color: "#fff",
+      //                         display: "flex",
+      //                         alignItems: "center",
+      //                         gap: 8,
+      //                       }}
+      //                     >
+      //                       <input
+      //                         type="checkbox"
+      //                         checked={!!msg.share}
+      //                         onChange={(e) => {
+      //                           const checked = e.target.checked;
+      //                           setInputs((prevState) => {
+      //                             const newInputs = { ...prevState };
+      //                             const item =
+      //                               newInputs.inputs[index].inputs[InnerIndex];
+      //                             item.messages = Array.isArray(item.messages)
+      //                               ? item.messages
+      //                               : [];
+      //                             item.messages[mIdx] = item.messages[mIdx] || {
+      //                               url: "",
+      //                               like: false,
+      //                               comment: false,
+      //                               share: false,
+      //                               reply: "",
+      //                               shareGroups: "",
+      //                             };
+      //                             item.messages[mIdx].share = checked;
+      //                             return newInputs;
+      //                           });
+      //                         }}
+      //                       />
+      //                       Share
+      //                     </label>
+      //                   </div>
+      //                   {/* Show reply input if comment is checked */}
+      //                   {msg.comment && (
+      //                     <InputText
+      //                       label={"Reply to post:"}
+      //                       type={"text"}
+      //                       placeholder={"Enter reply text"}
+      //                       name={`reply_${mIdx}`}
+      //                       handler={(val) => {
       //                         setInputs((prevState) => {
       //                           const newInputs = { ...prevState };
       //                           const item =
       //                             newInputs.inputs[index].inputs[InnerIndex];
-      //                           item.telegram_group_urls = Array.isArray(
-      //                             item.telegram_group_urls
-      //                           )
-      //                             ? item.telegram_group_urls
+      //                           item.messages = Array.isArray(item.messages)
+      //                             ? item.messages
       //                             : [];
-      //                           item.telegram_group_urls[gIdx] = val;
+      //                           item.messages[mIdx] = item.messages[mIdx] || {
+      //                             url: "",
+      //                             like: false,
+      //                             comment: false,
+      //                             share: false,
+      //                             reply: "",
+      //                             shareGroups: "",
+      //                           };
+      //                           item.messages[mIdx].reply = val;
       //                           return newInputs;
       //                         });
+      //                       }}
+      //                       isTaskInputs={true}
+      //                       value={msg.reply || ""}
+      //                     />
+      //                   )}
+      //                   {/* Show group names input if share is checked */}
+      //                   {msg.share && (
+      //                     <InputText
+      //                       label={"Groups to share in (comma separated):"}
+      //                       type={"text"}
+      //                       placeholder={
+      //                         "Enter group names, separated by commas"
       //                       }
-      //                     }}
-      //                     isTaskInputs={true}
-      //                     value={url}
-      //                   />
-      //                 ))}
-      //               </div>
-      //             )}
+      //                       name={`shareGroups_${mIdx}`}
+      //                       handler={(val) => {
+      //                         setInputs((prevState) => {
+      //                           const newInputs = { ...prevState };
+      //                           const item =
+      //                             newInputs.inputs[index].inputs[InnerIndex];
+      //                           item.messages = Array.isArray(item.messages)
+      //                             ? item.messages
+      //                             : [];
+      //                           item.messages[mIdx] = item.messages[mIdx] || {
+      //                             url: "",
+      //                             like: false,
+      //                             comment: false,
+      //                             share: false,
+      //                             reply: "",
+      //                             shareGroups: "",
+      //                           };
+      //                           item.messages[mIdx].shareGroups = val;
+      //                           return newInputs;
+      //                         });
+      //                       }}
+      //                       isTaskInputs={true}
+      //                       value={msg.shareGroups || ""}
+      //                     />
+      //                   )}
+      //                 </div>
+      //               ))}
+      //             </div>
+      //           )}
       //         </>
       //       )}
       //     </div>
