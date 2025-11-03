@@ -2094,9 +2094,12 @@ function Input(props) {
                           for (let i = videos.length; i < n; i++) {
                             videos.push({
                               youtube_link: "",
-                              prompt: "",
                               playDuration: 0,
-                              share: false,
+                              like: false,
+                              dislike: false,
+                              subscribe: false,
+                              shareOnTwitter: false,
+                              prompt: "",
                             });
                           }
                         } else if (n < videos.length) {
@@ -2123,9 +2126,12 @@ function Input(props) {
                           for (let i = videos.length; i < n; i++) {
                             videos.push({
                               youtube_link: "",
-                              prompt: "",
                               playDuration: 0,
-                              share: false,
+                              like: false,
+                              dislike: false,
+                              subscribe: false,
+                              shareOnTwitter: false,
+                              prompt: "",
                             });
                           }
                         } else if (n < videos.length) {
@@ -2170,6 +2176,7 @@ function Input(props) {
                             gap: 12,
                           }}
                         >
+                          {/* 1. YouTube URL input */}
                           <InputText
                             label={"YouTube URL:"}
                             type={"text"}
@@ -2193,9 +2200,12 @@ function Input(props) {
                                     vIdx
                                   ] || {
                                     youtube_link: "",
-                                    prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    like: false,
+                                    dislike: false,
+                                    subscribe: false,
+                                    shareOnTwitter: false,
+                                    prompt: "",
                                   };
                                   activity.videos[vIdx].youtube_link = val;
                                   return newInputs;
@@ -2210,9 +2220,12 @@ function Input(props) {
                                     : [];
                                   item.videos[vIdx] = item.videos[vIdx] || {
                                     youtube_link: "",
-                                    prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    like: false,
+                                    dislike: false,
+                                    subscribe: false,
+                                    shareOnTwitter: false,
+                                    prompt: "",
                                   };
                                   item.videos[vIdx].youtube_link = val;
                                   return newInputs;
@@ -2222,12 +2235,13 @@ function Input(props) {
                             isTaskInputs={true}
                             value={video.youtube_link}
                           />
-                          <InputText
-                            label={"Prompt / Notes:"}
-                            type={"text"}
-                            placeholder={"Enter prompt or instructions"}
-                            name={`youtube_prompt_${vIdx}`}
-                            handler={(val) => {
+
+                          {/* 2. Duration input */}
+                          <NumberInput
+                            lable={"Play duration (minutes):"}
+                            placeholder={"Enter play duration in minutes"}
+                            onChange={(value) => {
+                              const v = parseInt(value) || 0;
                               if (options.isMultiAccountActivity) {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
@@ -2245,11 +2259,14 @@ function Input(props) {
                                     vIdx
                                   ] || {
                                     youtube_link: "",
-                                    prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    like: false,
+                                    dislike: false,
+                                    subscribe: false,
+                                    shareOnTwitter: false,
+                                    prompt: "",
                                   };
-                                  activity.videos[vIdx].prompt = val;
+                                  activity.videos[vIdx].playDuration = v;
                                   return newInputs;
                                 });
                               } else {
@@ -2262,95 +2279,37 @@ function Input(props) {
                                     : [];
                                   item.videos[vIdx] = item.videos[vIdx] || {
                                     youtube_link: "",
-                                    prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    like: false,
+                                    dislike: false,
+                                    subscribe: false,
+                                    shareOnTwitter: false,
+                                    prompt: "",
                                   };
-                                  item.videos[vIdx].prompt = val;
+                                  item.videos[vIdx].playDuration = v;
                                   return newInputs;
                                 });
                               }
                             }}
-                            isTaskInputs={true}
-                            value={video.prompt || ""}
+                            min={0}
+                            Value={video.playDuration || ""}
                           />
-                          <div
-                            style={{
-                              display: "flex",
-                              gap: 50,
-                              alignItems: "center",
-                            }}
-                          >
-                            <div style={{ flex: "0 0 180px" }}>
-                              <NumberInput
-                                lable={"Play duration (minutes):"}
-                                placeholder={"Enter play duration in minutes"}
-                                onChange={(value) => {
-                                  const v = parseInt(value) || 0;
-                                  if (options.isMultiAccountActivity) {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const activity =
-                                        newInputs.inputs[options.parentIndex]
-                                          .inputs[InnerIndex].MultiAccounts[
-                                          options.accountIndex
-                                        ].activities[options.actIdx];
-                                      activity.videos = Array.isArray(
-                                        activity.videos
-                                      )
-                                        ? activity.videos
-                                        : [];
-                                      activity.videos[vIdx] = activity.videos[
-                                        vIdx
-                                      ] || {
-                                        youtube_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        share: false,
-                                      };
-                                      activity.videos[vIdx].playDuration = v;
-                                      return newInputs;
-                                    });
-                                  } else {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const item =
-                                        newInputs.inputs[index].inputs[
-                                          InnerIndex
-                                        ];
-                                      item.videos = Array.isArray(item.videos)
-                                        ? item.videos
-                                        : [];
-                                      item.videos[vIdx] = item.videos[vIdx] || {
-                                        youtube_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        share: false,
-                                      };
-                                      item.videos[vIdx].playDuration = v;
-                                      return newInputs;
-                                    });
-                                  }
-                                }}
-                                min={0}
-                                Value={video.playDuration || ""}
-                              />
-                            </div>
 
+                          {/* 3. Actions checkboxes */}
+                          <div
+                            style={{ display: "flex", gap: 24, marginTop: 8 }}
+                          >
                             <label
                               style={{
                                 color: "#fff",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 10,
-                                marginTop: "15px",
-                                fontSize: "20px",
+                                gap: 8,
                               }}
                             >
                               <input
                                 type="checkbox"
-                                name={`youtube_share_${vIdx}`}
-                                checked={!!video.share}
+                                checked={!!video.like}
                                 onChange={(e) => {
                                   const checked = e.target.checked;
                                   if (options.isMultiAccountActivity) {
@@ -2370,11 +2329,14 @@ function Input(props) {
                                         vIdx
                                       ] || {
                                         youtube_link: "",
-                                        prompt: "",
                                         playDuration: 0,
-                                        share: false,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
                                       };
-                                      activity.videos[vIdx].share = checked;
+                                      activity.videos[vIdx].like = checked;
                                       return newInputs;
                                     });
                                   } else {
@@ -2389,19 +2351,289 @@ function Input(props) {
                                         : [];
                                       item.videos[vIdx] = item.videos[vIdx] || {
                                         youtube_link: "",
-                                        prompt: "",
                                         playDuration: 0,
-                                        share: false,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
                                       };
-                                      item.videos[vIdx].share = checked;
+                                      item.videos[vIdx].like = checked;
                                       return newInputs;
                                     });
                                   }
                                 }}
                               />
-                              Share
+                              Like Video
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              {/* <input
+                                type="checkbox"
+                                checked={!!video.dislike}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.videos = Array.isArray(
+                                        activity.videos
+                                      )
+                                        ? activity.videos
+                                        : [];
+                                      activity.videos[vIdx] = activity.videos[
+                                        vIdx
+                                      ] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      activity.videos[vIdx].dislike = checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.videos = Array.isArray(item.videos)
+                                        ? item.videos
+                                        : [];
+                                      item.videos[vIdx] = item.videos[vIdx] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      item.videos[vIdx].dislike = checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Dislike Video
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            > */}
+                              <input
+                                type="checkbox"
+                                checked={!!video.subscribe}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.videos = Array.isArray(
+                                        activity.videos
+                                      )
+                                        ? activity.videos
+                                        : [];
+                                      activity.videos[vIdx] = activity.videos[
+                                        vIdx
+                                      ] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      activity.videos[vIdx].subscribe = checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.videos = Array.isArray(item.videos)
+                                        ? item.videos
+                                        : [];
+                                      item.videos[vIdx] = item.videos[vIdx] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      item.videos[vIdx].subscribe = checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Subscribe Channel
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!video.shareOnTwitter}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.videos = Array.isArray(
+                                        activity.videos
+                                      )
+                                        ? activity.videos
+                                        : [];
+                                      activity.videos[vIdx] = activity.videos[
+                                        vIdx
+                                      ] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      activity.videos[vIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.videos = Array.isArray(item.videos)
+                                        ? item.videos
+                                        : [];
+                                      item.videos[vIdx] = item.videos[vIdx] || {
+                                        youtube_link: "",
+                                        playDuration: 0,
+                                        like: false,
+                                        dislike: false,
+                                        subscribe: false,
+                                        shareOnTwitter: false,
+                                        prompt: "",
+                                      };
+                                      item.videos[vIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Share on Twitter
                             </label>
                           </div>
+
+                          {/* Show prompt input if Share on Twitter is checked */}
+                          {video.shareOnTwitter && (
+                            <InputText
+                              label={"Prompt / Notes:"}
+                              type={"text"}
+                              placeholder={"Enter prompt or instructions"}
+                              name={`youtube_prompt_${vIdx}`}
+                              handler={(val) => {
+                                if (options.isMultiAccountActivity) {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const activity =
+                                      newInputs.inputs[options.parentIndex]
+                                        .inputs[InnerIndex].MultiAccounts[
+                                        options.accountIndex
+                                      ].activities[options.actIdx];
+                                    activity.videos = Array.isArray(
+                                      activity.videos
+                                    )
+                                      ? activity.videos
+                                      : [];
+                                    activity.videos[vIdx] = activity.videos[
+                                      vIdx
+                                    ] || {
+                                      youtube_link: "",
+                                      playDuration: 0,
+                                      like: false,
+                                      dislike: false,
+                                      subscribe: false,
+                                      shareOnTwitter: false,
+                                      prompt: "",
+                                    };
+                                    activity.videos[vIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                } else {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.videos = Array.isArray(item.videos)
+                                      ? item.videos
+                                      : [];
+                                    item.videos[vIdx] = item.videos[vIdx] || {
+                                      youtube_link: "",
+                                      playDuration: 0,
+                                      like: false,
+                                      dislike: false,
+                                      subscribe: false,
+                                      shareOnTwitter: false,
+                                      prompt: "",
+                                    };
+                                    item.videos[vIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                }
+                              }}
+                              isTaskInputs={true}
+                              value={video.prompt || ""}
+                            />
+                          )}
                         </div>
                       </div>
                     ))}
@@ -2522,11 +2754,11 @@ function Input(props) {
                             gap: 12,
                           }}
                         >
-                          {/* Row 1 - Album URL (full width) */}
+                          {/* 1. Track URL input */}
                           <InputText
-                            label={"Album URL:"}
+                            label={"Track URL:"}
                             type={"text"}
-                            placeholder={"Enter Spotify album URL"}
+                            placeholder={"Enter Spotify track URL"}
                             name={`spotify_link_${aIdx}`}
                             handler={(val) => {
                               if (options.isMultiAccountActivity) {
@@ -2548,7 +2780,9 @@ function Input(props) {
                                     spotify_link: "",
                                     prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
                                   };
                                   activity.albums[aIdx].spotify_link = val;
                                   return newInputs;
@@ -2565,7 +2799,9 @@ function Input(props) {
                                     spotify_link: "",
                                     prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
                                   };
                                   item.albums[aIdx].spotify_link = val;
                                   return newInputs;
@@ -2576,13 +2812,12 @@ function Input(props) {
                             value={album.spotify_link}
                           />
 
-                          {/* Row 2 - Prompt (full width) */}
-                          <InputText
-                            label={"Prompt / Notes:"}
-                            type={"text"}
-                            placeholder={"Enter prompt or instructions"}
-                            name={`spotify_prompt_${aIdx}`}
-                            handler={(val) => {
+                          {/* 2. Duration input */}
+                          <NumberInput
+                            lable={"Play duration (minutes):"}
+                            placeholder={"Enter play duration in minutes"}
+                            onChange={(value) => {
+                              const v = parseInt(value) || 0;
                               if (options.isMultiAccountActivity) {
                                 setInputs((prevState) => {
                                   const newInputs = { ...prevState };
@@ -2602,9 +2837,11 @@ function Input(props) {
                                     spotify_link: "",
                                     prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
                                   };
-                                  activity.albums[aIdx].prompt = val;
+                                  activity.albums[aIdx].playDuration = v;
                                   return newInputs;
                                 });
                               } else {
@@ -2619,95 +2856,34 @@ function Input(props) {
                                     spotify_link: "",
                                     prompt: "",
                                     playDuration: 0,
-                                    share: false,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
                                   };
-                                  item.albums[aIdx].prompt = val;
+                                  item.albums[aIdx].playDuration = v;
                                   return newInputs;
                                 });
                               }
                             }}
-                            isTaskInputs={true}
-                            value={album.prompt || ""}
+                            min={0}
+                            Value={album.playDuration || ""}
                           />
 
-                          {/* Row 3 - Duration + Share checkbox side-by-side */}
+                          {/* 3. Actions checkboxes */}
                           <div
-                            style={{
-                              display: "flex",
-                              gap: 50,
-                              alignItems: "center",
-                            }}
+                            style={{ display: "flex", gap: 24, marginTop: 8 }}
                           >
-                            <div style={{ flex: "0 0 180px" }}>
-                              <NumberInput
-                                lable={"Play duration (minutes):"}
-                                placeholder={"Enter play duration in minutes"}
-                                onChange={(value) => {
-                                  const v = parseInt(value) || 0;
-                                  if (options.isMultiAccountActivity) {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const activity =
-                                        newInputs.inputs[options.parentIndex]
-                                          .inputs[InnerIndex].MultiAccounts[
-                                          options.accountIndex
-                                        ].activities[options.actIdx];
-                                      activity.albums = Array.isArray(
-                                        activity.albums
-                                      )
-                                        ? activity.albums
-                                        : [];
-                                      activity.albums[aIdx] = activity.albums[
-                                        aIdx
-                                      ] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        share: false,
-                                      };
-                                      activity.albums[aIdx].playDuration = v;
-                                      return newInputs;
-                                    });
-                                  } else {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const item =
-                                        newInputs.inputs[index].inputs[
-                                          InnerIndex
-                                        ];
-                                      item.albums = Array.isArray(item.albums)
-                                        ? item.albums
-                                        : [];
-                                      item.albums[aIdx] = item.albums[aIdx] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        share: false,
-                                      };
-                                      item.albums[aIdx].playDuration = v;
-                                      return newInputs;
-                                    });
-                                  }
-                                }}
-                                min={0}
-                                Value={album.playDuration || ""}
-                              />
-                            </div>
-
                             <label
                               style={{
                                 color: "#fff",
                                 display: "flex",
                                 alignItems: "center",
-                                gap: 10,
-                                marginTop: "15px",
-                                fontSize: "20px",
+                                gap: 8,
                               }}
                             >
                               <input
                                 type="checkbox"
-                                name={`spotify_share_${aIdx}`}
-                                checked={!!album.share}
+                                checked={!!album.addToLibrary}
                                 onChange={(e) => {
                                   const checked = e.target.checked;
                                   if (options.isMultiAccountActivity) {
@@ -2729,9 +2905,12 @@ function Input(props) {
                                         spotify_link: "",
                                         prompt: "",
                                         playDuration: 0,
-                                        share: false,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
                                       };
-                                      activity.albums[aIdx].share = checked;
+                                      activity.albums[aIdx].addToLibrary =
+                                        checked;
                                       return newInputs;
                                     });
                                   } else {
@@ -2748,17 +2927,214 @@ function Input(props) {
                                         spotify_link: "",
                                         prompt: "",
                                         playDuration: 0,
-                                        share: false,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
                                       };
-                                      item.albums[aIdx].share = checked;
+                                      item.albums[aIdx].addToLibrary = checked;
                                       return newInputs;
                                     });
                                   }
                                 }}
                               />
-                              Share
+                              Add to Library
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!album.followArtist}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.albums = Array.isArray(
+                                        activity.albums
+                                      )
+                                        ? activity.albums
+                                        : [];
+                                      activity.albums[aIdx] = activity.albums[
+                                        aIdx
+                                      ] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      activity.albums[aIdx].followArtist =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.albums = Array.isArray(item.albums)
+                                        ? item.albums
+                                        : [];
+                                      item.albums[aIdx] = item.albums[aIdx] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      item.albums[aIdx].followArtist = checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Follow Artist
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!album.shareOnTwitter}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.albums = Array.isArray(
+                                        activity.albums
+                                      )
+                                        ? activity.albums
+                                        : [];
+                                      activity.albums[aIdx] = activity.albums[
+                                        aIdx
+                                      ] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      activity.albums[aIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.albums = Array.isArray(item.albums)
+                                        ? item.albums
+                                        : [];
+                                      item.albums[aIdx] = item.albums[aIdx] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      item.albums[aIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Share on Twitter
                             </label>
                           </div>
+
+                          {/* Show prompt input if Share on Twitter is checked */}
+                          {album.shareOnTwitter && (
+                            <InputText
+                              label={"Prompt / Notes:"}
+                              type={"text"}
+                              placeholder={"Enter prompt or instructions"}
+                              name={`spotify_prompt_${aIdx}`}
+                              handler={(val) => {
+                                if (options.isMultiAccountActivity) {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const activity =
+                                      newInputs.inputs[options.parentIndex]
+                                        .inputs[InnerIndex].MultiAccounts[
+                                        options.accountIndex
+                                      ].activities[options.actIdx];
+                                    activity.albums = Array.isArray(
+                                      activity.albums
+                                    )
+                                      ? activity.albums
+                                      : [];
+                                    activity.albums[aIdx] = activity.albums[
+                                      aIdx
+                                    ] || {
+                                      spotify_link: "",
+                                      prompt: "",
+                                      playDuration: 0,
+                                      addToLibrary: false,
+                                      followArtist: false,
+                                      shareOnTwitter: false,
+                                    };
+                                    activity.albums[aIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                } else {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.albums = Array.isArray(item.albums)
+                                      ? item.albums
+                                      : [];
+                                    item.albums[aIdx] = item.albums[aIdx] || {
+                                      spotify_link: "",
+                                      prompt: "",
+                                      playDuration: 0,
+                                      addToLibrary: false,
+                                      followArtist: false,
+                                      shareOnTwitter: false,
+                                    };
+                                    item.albums[aIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                }
+                              }}
+                              isTaskInputs={true}
+                              value={album.prompt || ""}
+                            />
+                          )}
                         </div>
                       </div>
                     ))}
@@ -3282,6 +3658,7 @@ function Input(props) {
       //                   for (let i = messages.length; i < n; i++) {
       //                     messages.push({
       //                       url: "",
+      //                       keyword: "",
       //                       like: false,
       //                       comment: false,
       //                       share: false,
@@ -3310,55 +3687,27 @@ function Input(props) {
       //                 >
       //                   <div
       //                     style={{
-      //                       marginBottom: 8,
-      //                       fontWeight: 500,
+      //                       marginBottom: 10,
+      //                       fontWeight: 600,
       //                       color: "#fff",
       //                     }}
       //                   >
       //                     Message #{mIdx + 1}
       //                   </div>
-      //                   <InputText
-      //                     label={"Message/URL:"}
-      //                     type={"text"}
-      //                     placeholder={"Enter message or URL to interact"}
-      //                     name={`message_url_${mIdx}`}
-      //                     handler={(val) => {
-      //                       setInputs((prevState) => {
-      //                         const newInputs = { ...prevState };
-      //                         const item =
-      //                           newInputs.inputs[index].inputs[InnerIndex];
-      //                         item.messages = Array.isArray(item.messages)
-      //                           ? item.messages
-      //                           : [];
-      //                         item.messages[mIdx] = item.messages[mIdx] || {
-      //                           url: "",
-      //                           like: false,
-      //                           comment: false,
-      //                           share: false,
-      //                           reply: "",
-      //                           shareGroups: "",
-      //                         };
-      //                         item.messages[mIdx].url = val;
-      //                         return newInputs;
-      //                       });
+      //                   <div
+      //                     style={{
+      //                       display: "flex",
+      //                       flexDirection: "column",
+      //                       gap: 15,
       //                     }}
-      //                     isTaskInputs={true}
-      //                     value={msg.url || ""}
-      //                   />
-      //                   <div style={{ display: "flex", gap: 24, marginTop: 8 }}>
-      //                     <label
-      //                       style={{
-      //                         color: "#fff",
-      //                         display: "flex",
-      //                         alignItems: "center",
-      //                         gap: 8,
-      //                       }}
-      //                     >
-      //                       <input
-      //                         type="checkbox"
-      //                         checked={!!msg.like}
-      //                         onChange={(e) => {
-      //                           const checked = e.target.checked;
+      //                   >
+      //                     <div style={{ marginTop: 5 }}>
+      //                       <InputText
+      //                         label={"Message/URL:"}
+      //                         type={"text"}
+      //                         placeholder={"Enter message or URL to interact"}
+      //                         name={`message_url_${mIdx}`}
+      //                         handler={(val) => {
       //                           setInputs((prevState) => {
       //                             const newInputs = { ...prevState };
       //                             const item =
@@ -3368,32 +3717,28 @@ function Input(props) {
       //                               : [];
       //                             item.messages[mIdx] = item.messages[mIdx] || {
       //                               url: "",
+      //                               keyword: "",
       //                               like: false,
       //                               comment: false,
       //                               share: false,
       //                               reply: "",
       //                               shareGroups: "",
       //                             };
-      //                             item.messages[mIdx].like = checked;
+      //                             item.messages[mIdx].url = val;
       //                             return newInputs;
       //                           });
       //                         }}
+      //                         isTaskInputs={true}
+      //                         value={msg.url || ""}
       //                       />
-      //                       Like
-      //                     </label>
-      //                     <label
-      //                       style={{
-      //                         color: "#fff",
-      //                         display: "flex",
-      //                         alignItems: "center",
-      //                         gap: 8,
-      //                       }}
-      //                     >
-      //                       <input
-      //                         type="checkbox"
-      //                         checked={!!msg.comment}
-      //                         onChange={(e) => {
-      //                           const checked = e.target.checked;
+      //                     </div>
+      //                     <div style={{ marginTop: 5 }}>
+      //                       <InputText
+      //                         label={"Keyword:"}
+      //                         type={"text"}
+      //                         placeholder={"Enter keyword"}
+      //                         name={`keyword_${mIdx}`}
+      //                         handler={(val) => {
       //                           setInputs((prevState) => {
       //                             const newInputs = { ...prevState };
       //                             const item =
@@ -3403,118 +3748,224 @@ function Input(props) {
       //                               : [];
       //                             item.messages[mIdx] = item.messages[mIdx] || {
       //                               url: "",
+      //                               keyword: "",
       //                               like: false,
       //                               comment: false,
       //                               share: false,
       //                               reply: "",
       //                               shareGroups: "",
       //                             };
-      //                             item.messages[mIdx].comment = checked;
+      //                             item.messages[mIdx].keyword = val;
       //                             return newInputs;
       //                           });
       //                         }}
+      //                         isTaskInputs={true}
+      //                         value={msg.keyword || ""}
       //                       />
-      //                       Comment
-      //                     </label>
-      //                     <label
+      //                     </div>
+      //                     <div
       //                       style={{
+      //                         marginTop: 5,
+      //                         fontWeight: 500,
       //                         color: "#fff",
-      //                         display: "flex",
-      //                         alignItems: "center",
-      //                         gap: 8,
       //                       }}
       //                     >
-      //                       <input
-      //                         type="checkbox"
-      //                         checked={!!msg.share}
-      //                         onChange={(e) => {
-      //                           const checked = e.target.checked;
-      //                           setInputs((prevState) => {
-      //                             const newInputs = { ...prevState };
-      //                             const item =
-      //                               newInputs.inputs[index].inputs[InnerIndex];
-      //                             item.messages = Array.isArray(item.messages)
-      //                               ? item.messages
-      //                               : [];
-      //                             item.messages[mIdx] = item.messages[mIdx] || {
-      //                               url: "",
-      //                               like: false,
-      //                               comment: false,
-      //                               share: false,
-      //                               reply: "",
-      //                               shareGroups: "",
-      //                             };
-      //                             item.messages[mIdx].share = checked;
-      //                             return newInputs;
-      //                           });
+      //                       Actions:
+      //                     </div>
+      //                     <div
+      //                       style={{ display: "flex", gap: 60, marginTop: 0 }}
+      //                     >
+      //                       <label
+      //                         style={{
+      //                           color: "#fff",
+      //                           display: "flex",
+      //                           alignItems: "center",
+      //                           gap: 8,
       //                         }}
-      //                       />
-      //                       Share
-      //                     </label>
+      //                       >
+      //                         <input
+      //                           type="checkbox"
+      //                           checked={!!msg.like}
+      //                           onChange={(e) => {
+      //                             const checked = e.target.checked;
+      //                             setInputs((prevState) => {
+      //                               const newInputs = { ...prevState };
+      //                               const item =
+      //                                 newInputs.inputs[index].inputs[
+      //                                   InnerIndex
+      //                                 ];
+      //                               item.messages = Array.isArray(item.messages)
+      //                                 ? item.messages
+      //                                 : [];
+      //                               item.messages[mIdx] = item.messages[
+      //                                 mIdx
+      //                               ] || {
+      //                                 url: "",
+      //                                 keyword: "",
+      //                                 like: false,
+      //                                 comment: false,
+      //                                 share: false,
+      //                                 reply: "",
+      //                                 shareGroups: "",
+      //                               };
+      //                               item.messages[mIdx].like = checked;
+      //                               return newInputs;
+      //                             });
+      //                           }}
+      //                         />
+      //                         Like
+      //                       </label>
+      //                       <label
+      //                         style={{
+      //                           color: "#fff",
+      //                           display: "flex",
+      //                           alignItems: "center",
+      //                           gap: 8,
+      //                         }}
+      //                       >
+      //                         <input
+      //                           type="checkbox"
+      //                           checked={!!msg.comment}
+      //                           onChange={(e) => {
+      //                             const checked = e.target.checked;
+      //                             setInputs((prevState) => {
+      //                               const newInputs = { ...prevState };
+      //                               const item =
+      //                                 newInputs.inputs[index].inputs[
+      //                                   InnerIndex
+      //                                 ];
+      //                               item.messages = Array.isArray(item.messages)
+      //                                 ? item.messages
+      //                                 : [];
+      //                               item.messages[mIdx] = item.messages[
+      //                                 mIdx
+      //                               ] || {
+      //                                 url: "",
+      //                                 keyword: "",
+      //                                 like: false,
+      //                                 comment: false,
+      //                                 share: false,
+      //                                 reply: "",
+      //                                 shareGroups: "",
+      //                               };
+      //                               item.messages[mIdx].comment = checked;
+      //                               return newInputs;
+      //                             });
+      //                           }}
+      //                         />
+      //                         Comment
+      //                       </label>
+      //                       <label
+      //                         style={{
+      //                           color: "#fff",
+      //                           display: "flex",
+      //                           alignItems: "center",
+      //                           gap: 8,
+      //                         }}
+      //                       >
+      //                         <input
+      //                           type="checkbox"
+      //                           checked={!!msg.share}
+      //                           onChange={(e) => {
+      //                             const checked = e.target.checked;
+      //                             setInputs((prevState) => {
+      //                               const newInputs = { ...prevState };
+      //                               const item =
+      //                                 newInputs.inputs[index].inputs[
+      //                                   InnerIndex
+      //                                 ];
+      //                               item.messages = Array.isArray(item.messages)
+      //                                 ? item.messages
+      //                                 : [];
+      //                               item.messages[mIdx] = item.messages[
+      //                                 mIdx
+      //                               ] || {
+      //                                 url: "",
+      //                                 keyword: "",
+      //                                 like: false,
+      //                                 comment: false,
+      //                                 share: false,
+      //                                 reply: "",
+      //                                 shareGroups: "",
+      //                               };
+      //                               item.messages[mIdx].share = checked;
+      //                               return newInputs;
+      //                             });
+      //                           }}
+      //                         />
+      //                         Share
+      //                       </label>
+      //                     </div>
       //                   </div>
       //                   {/* Show reply input if comment is checked */}
       //                   {msg.comment && (
-      //                     <InputText
-      //                       label={"Reply to post:"}
-      //                       type={"text"}
-      //                       placeholder={"Enter reply text"}
-      //                       name={`reply_${mIdx}`}
-      //                       handler={(val) => {
-      //                         setInputs((prevState) => {
-      //                           const newInputs = { ...prevState };
-      //                           const item =
-      //                             newInputs.inputs[index].inputs[InnerIndex];
-      //                           item.messages = Array.isArray(item.messages)
-      //                             ? item.messages
-      //                             : [];
-      //                           item.messages[mIdx] = item.messages[mIdx] || {
-      //                             url: "",
-      //                             like: false,
-      //                             comment: false,
-      //                             share: false,
-      //                             reply: "",
-      //                             shareGroups: "",
-      //                           };
-      //                           item.messages[mIdx].reply = val;
-      //                           return newInputs;
-      //                         });
-      //                       }}
-      //                       isTaskInputs={true}
-      //                       value={msg.reply || ""}
-      //                     />
+      //                     <div style={{ marginTop: 15 }}>
+      //                       <InputText
+      //                         label={"Reply to post:"}
+      //                         type={"text"}
+      //                         placeholder={"Enter reply text"}
+      //                         name={`reply_${mIdx}`}
+      //                         handler={(val) => {
+      //                           setInputs((prevState) => {
+      //                             const newInputs = { ...prevState };
+      //                             const item =
+      //                               newInputs.inputs[index].inputs[InnerIndex];
+      //                             item.messages = Array.isArray(item.messages)
+      //                               ? item.messages
+      //                               : [];
+      //                             item.messages[mIdx] = item.messages[mIdx] || {
+      //                               url: "",
+      //                               keyword: "",
+      //                               like: false,
+      //                               comment: false,
+      //                               share: false,
+      //                               reply: "",
+      //                               shareGroups: "",
+      //                             };
+      //                             item.messages[mIdx].reply = val;
+      //                             return newInputs;
+      //                           });
+      //                         }}
+      //                         isTaskInputs={true}
+      //                         value={msg.reply || ""}
+      //                       />
+      //                     </div>
       //                   )}
       //                   {/* Show group names input if share is checked */}
       //                   {msg.share && (
-      //                     <InputText
-      //                       label={"Groups to share in (comma separated):"}
-      //                       type={"text"}
-      //                       placeholder={
-      //                         "Enter group names, separated by commas"
-      //                       }
-      //                       name={`shareGroups_${mIdx}`}
-      //                       handler={(val) => {
-      //                         setInputs((prevState) => {
-      //                           const newInputs = { ...prevState };
-      //                           const item =
-      //                             newInputs.inputs[index].inputs[InnerIndex];
-      //                           item.messages = Array.isArray(item.messages)
-      //                             ? item.messages
-      //                             : [];
-      //                           item.messages[mIdx] = item.messages[mIdx] || {
-      //                             url: "",
-      //                             like: false,
-      //                             comment: false,
-      //                             share: false,
-      //                             reply: "",
-      //                             shareGroups: "",
-      //                           };
-      //                           item.messages[mIdx].shareGroups = val;
-      //                           return newInputs;
-      //                         });
-      //                       }}
-      //                       isTaskInputs={true}
-      //                       value={msg.shareGroups || ""}
-      //                     />
+      //                     <div style={{ marginTop: 15 }}>
+      //                       <InputText
+      //                         label={"Groups to share in (comma separated):"}
+      //                         type={"text"}
+      //                         placeholder={
+      //                           "Enter group names, separated by commas"
+      //                         }
+      //                         name={`shareGroups_${mIdx}`}
+      //                         handler={(val) => {
+      //                           setInputs((prevState) => {
+      //                             const newInputs = { ...prevState };
+      //                             const item =
+      //                               newInputs.inputs[index].inputs[InnerIndex];
+      //                             item.messages = Array.isArray(item.messages)
+      //                               ? item.messages
+      //                               : [];
+      //                             item.messages[mIdx] = item.messages[mIdx] || {
+      //                               url: "",
+      //                               keyword: "",
+      //                               like: false,
+      //                               comment: false,
+      //                               share: false,
+      //                               reply: "",
+      //                               shareGroups: "",
+      //                             };
+      //                             item.messages[mIdx].shareGroups = val;
+      //                             return newInputs;
+      //                           });
+      //                         }}
+      //                         isTaskInputs={true}
+      //                         value={msg.shareGroups || ""}
+      //                       />
+      //                     </div>
       //                   )}
       //                 </div>
       //               ))}
