@@ -3517,7 +3517,7 @@ function Input(props) {
               <>
                 {/* Number of groups to join */}
                 <NumberInput
-                  lable={"How many Telegram groups?"}
+                  lable={"How many Telegram groups/channels?"}
                   min={0}
                   Value={el.numberOfGroups || 0}
                   onChange={(value) => {
@@ -3577,7 +3577,7 @@ function Input(props) {
                           key={gIdx}
                           label={`Group URL #${gIdx + 1}`}
                           type="text"
-                          placeholder="Enter Telegram group URL"
+                          placeholder="Enter Telegram group/channel URL"
                           name={`telegram_group_url_${gIdx}`}
                           handler={(val) => {
                             if (options.isMultiAccountActivity) {
@@ -3621,360 +3621,517 @@ function Input(props) {
             )}
           </div>
         );
-      // case "telegramToggleAndPost":
-      //   return (
-      //     <div className={classes.Inputscontainer}>
-      //       <ToggleInput
-      //         el={el}
-      //         inputsToggleChangeHandler={(idx, innerIdx) =>
-      //           options.isMultiAccountActivity
-      //             ? inputsToggleChangeHandler(idx, innerIdx, options)
-      //             : inputsToggleChangeHandler(idx, innerIdx)
-      //         }
-      //         index={index}
-      //         InnerIndex={InnerIndex}
-      //       />
-      //       {el.input && (
-      //         <>
-      //           <NumberInput
-      //             lable={"How many messages/posts to interact?"}
-      //             min={0}
-      //             Value={el.numberOfMessages || 0}
-      //             onChange={(value) => {
-      //               const n = parseInt(value) || 0;
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 n,
-      //                 "numberOfMessages"
-      //               );
-      //               setInputs((prevState) => {
-      //                 const newInputs = { ...prevState };
-      //                 const item = newInputs.inputs[index].inputs[InnerIndex];
-      //                 let messages = Array.isArray(item.messages)
-      //                   ? item.messages
-      //                   : [];
-      //                 if (n > messages.length) {
-      //                   for (let i = messages.length; i < n; i++) {
-      //                     messages.push({
-      //                       url: "",
-      //                       keyword: "",
-      //                       like: false,
-      //                       comment: false,
-      //                       share: false,
-      //                     });
-      //                   }
-      //                 } else if (n < messages.length) {
-      //                   messages = messages.slice(0, n);
-      //                 }
-      //                 item.messages = messages;
-      //                 item.numberOfMessages = n;
-      //                 return newInputs;
-      //               });
-      //             }}
-      //           />
-      //           {Array.isArray(el.messages) && el.messages.length > 0 && (
-      //             <div style={{ marginTop: 12 }}>
-      //               {el.messages.map((msg, mIdx) => (
-      //                 <div
-      //                   key={mIdx}
-      //                   style={{
-      //                     border: "1px solid #444",
-      //                     borderRadius: 8,
-      //                     padding: 12,
-      //                     marginBottom: 12,
-      //                   }}
-      //                 >
-      //                   <div
-      //                     style={{
-      //                       marginBottom: 10,
-      //                       fontWeight: 600,
-      //                       color: "#fff",
-      //                     }}
-      //                   >
-      //                     Message #{mIdx + 1}
-      //                   </div>
-      //                   <div
-      //                     style={{
-      //                       display: "flex",
-      //                       flexDirection: "column",
-      //                       gap: 15,
-      //                     }}
-      //                   >
-      //                     <div style={{ marginTop: 5 }}>
-      //                       <InputText
-      //                         label={"Message/URL:"}
-      //                         type={"text"}
-      //                         placeholder={"Enter message or URL to interact"}
-      //                         name={`message_url_${mIdx}`}
-      //                         handler={(val) => {
-      //                           setInputs((prevState) => {
-      //                             const newInputs = { ...prevState };
-      //                             const item =
-      //                               newInputs.inputs[index].inputs[InnerIndex];
-      //                             item.messages = Array.isArray(item.messages)
-      //                               ? item.messages
-      //                               : [];
-      //                             item.messages[mIdx] = item.messages[mIdx] || {
-      //                               url: "",
-      //                               keyword: "",
-      //                               like: false,
-      //                               comment: false,
-      //                               share: false,
-      //                               reply: "",
-      //                               shareGroups: "",
-      //                             };
-      //                             item.messages[mIdx].url = val;
-      //                             return newInputs;
-      //                           });
-      //                         }}
-      //                         isTaskInputs={true}
-      //                         value={msg.url || ""}
-      //                       />
-      //                     </div>
-      //                     <div style={{ marginTop: 5 }}>
-      //                       <InputText
-      //                         label={"Keyword:"}
-      //                         type={"text"}
-      //                         placeholder={"Enter keyword"}
-      //                         name={`keyword_${mIdx}`}
-      //                         handler={(val) => {
-      //                           setInputs((prevState) => {
-      //                             const newInputs = { ...prevState };
-      //                             const item =
-      //                               newInputs.inputs[index].inputs[InnerIndex];
-      //                             item.messages = Array.isArray(item.messages)
-      //                               ? item.messages
-      //                               : [];
-      //                             item.messages[mIdx] = item.messages[mIdx] || {
-      //                               url: "",
-      //                               keyword: "",
-      //                               like: false,
-      //                               comment: false,
-      //                               share: false,
-      //                               reply: "",
-      //                               shareGroups: "",
-      //                             };
-      //                             item.messages[mIdx].keyword = val;
-      //                             return newInputs;
-      //                           });
-      //                         }}
-      //                         isTaskInputs={true}
-      //                         value={msg.keyword || ""}
-      //                       />
-      //                     </div>
-      //                     <div
-      //                       style={{
-      //                         marginTop: 5,
-      //                         fontWeight: 500,
-      //                         color: "#fff",
-      //                       }}
-      //                     >
-      //                       Actions:
-      //                     </div>
-      //                     <div
-      //                       style={{ display: "flex", gap: 60, marginTop: 0 }}
-      //                     >
-      //                       <label
-      //                         style={{
-      //                           color: "#fff",
-      //                           display: "flex",
-      //                           alignItems: "center",
-      //                           gap: 8,
-      //                         }}
-      //                       >
-      //                         <input
-      //                           type="checkbox"
-      //                           checked={!!msg.like}
-      //                           onChange={(e) => {
-      //                             const checked = e.target.checked;
-      //                             setInputs((prevState) => {
-      //                               const newInputs = { ...prevState };
-      //                               const item =
-      //                                 newInputs.inputs[index].inputs[
-      //                                   InnerIndex
-      //                                 ];
-      //                               item.messages = Array.isArray(item.messages)
-      //                                 ? item.messages
-      //                                 : [];
-      //                               item.messages[mIdx] = item.messages[
-      //                                 mIdx
-      //                               ] || {
-      //                                 url: "",
-      //                                 keyword: "",
-      //                                 like: false,
-      //                                 comment: false,
-      //                                 share: false,
-      //                                 reply: "",
-      //                                 shareGroups: "",
-      //                               };
-      //                               item.messages[mIdx].like = checked;
-      //                               return newInputs;
-      //                             });
-      //                           }}
-      //                         />
-      //                         Like
-      //                       </label>
-      //                       <label
-      //                         style={{
-      //                           color: "#fff",
-      //                           display: "flex",
-      //                           alignItems: "center",
-      //                           gap: 8,
-      //                         }}
-      //                       >
-      //                         <input
-      //                           type="checkbox"
-      //                           checked={!!msg.comment}
-      //                           onChange={(e) => {
-      //                             const checked = e.target.checked;
-      //                             setInputs((prevState) => {
-      //                               const newInputs = { ...prevState };
-      //                               const item =
-      //                                 newInputs.inputs[index].inputs[
-      //                                   InnerIndex
-      //                                 ];
-      //                               item.messages = Array.isArray(item.messages)
-      //                                 ? item.messages
-      //                                 : [];
-      //                               item.messages[mIdx] = item.messages[
-      //                                 mIdx
-      //                               ] || {
-      //                                 url: "",
-      //                                 keyword: "",
-      //                                 like: false,
-      //                                 comment: false,
-      //                                 share: false,
-      //                                 reply: "",
-      //                                 shareGroups: "",
-      //                               };
-      //                               item.messages[mIdx].comment = checked;
-      //                               return newInputs;
-      //                             });
-      //                           }}
-      //                         />
-      //                         Comment
-      //                       </label>
-      //                       <label
-      //                         style={{
-      //                           color: "#fff",
-      //                           display: "flex",
-      //                           alignItems: "center",
-      //                           gap: 8,
-      //                         }}
-      //                       >
-      //                         <input
-      //                           type="checkbox"
-      //                           checked={!!msg.share}
-      //                           onChange={(e) => {
-      //                             const checked = e.target.checked;
-      //                             setInputs((prevState) => {
-      //                               const newInputs = { ...prevState };
-      //                               const item =
-      //                                 newInputs.inputs[index].inputs[
-      //                                   InnerIndex
-      //                                 ];
-      //                               item.messages = Array.isArray(item.messages)
-      //                                 ? item.messages
-      //                                 : [];
-      //                               item.messages[mIdx] = item.messages[
-      //                                 mIdx
-      //                               ] || {
-      //                                 url: "",
-      //                                 keyword: "",
-      //                                 like: false,
-      //                                 comment: false,
-      //                                 share: false,
-      //                                 reply: "",
-      //                                 shareGroups: "",
-      //                               };
-      //                               item.messages[mIdx].share = checked;
-      //                               return newInputs;
-      //                             });
-      //                           }}
-      //                         />
-      //                         Share
-      //                       </label>
-      //                     </div>
-      //                   </div>
-      //                   {/* Show reply input if comment is checked */}
-      //                   {msg.comment && (
-      //                     <div style={{ marginTop: 15 }}>
-      //                       <InputText
-      //                         label={"Reply to post:"}
-      //                         type={"text"}
-      //                         placeholder={"Enter reply text"}
-      //                         name={`reply_${mIdx}`}
-      //                         handler={(val) => {
-      //                           setInputs((prevState) => {
-      //                             const newInputs = { ...prevState };
-      //                             const item =
-      //                               newInputs.inputs[index].inputs[InnerIndex];
-      //                             item.messages = Array.isArray(item.messages)
-      //                               ? item.messages
-      //                               : [];
-      //                             item.messages[mIdx] = item.messages[mIdx] || {
-      //                               url: "",
-      //                               keyword: "",
-      //                               like: false,
-      //                               comment: false,
-      //                               share: false,
-      //                               reply: "",
-      //                               shareGroups: "",
-      //                             };
-      //                             item.messages[mIdx].reply = val;
-      //                             return newInputs;
-      //                           });
-      //                         }}
-      //                         isTaskInputs={true}
-      //                         value={msg.reply || ""}
-      //                       />
-      //                     </div>
-      //                   )}
-      //                   {/* Show group names input if share is checked */}
-      //                   {msg.share && (
-      //                     <div style={{ marginTop: 15 }}>
-      //                       <InputText
-      //                         label={"Groups to share in (comma separated):"}
-      //                         type={"text"}
-      //                         placeholder={
-      //                           "Enter group names, separated by commas"
-      //                         }
-      //                         name={`shareGroups_${mIdx}`}
-      //                         handler={(val) => {
-      //                           setInputs((prevState) => {
-      //                             const newInputs = { ...prevState };
-      //                             const item =
-      //                               newInputs.inputs[index].inputs[InnerIndex];
-      //                             item.messages = Array.isArray(item.messages)
-      //                               ? item.messages
-      //                               : [];
-      //                             item.messages[mIdx] = item.messages[mIdx] || {
-      //                               url: "",
-      //                               keyword: "",
-      //                               like: false,
-      //                               comment: false,
-      //                               share: false,
-      //                               reply: "",
-      //                               shareGroups: "",
-      //                             };
-      //                             item.messages[mIdx].shareGroups = val;
-      //                             return newInputs;
-      //                           });
-      //                         }}
-      //                         isTaskInputs={true}
-      //                         value={msg.shareGroups || ""}
-      //                       />
-      //                     </div>
-      //                   )}
-      //                 </div>
-      //               ))}
-      //             </div>
-      //           )}
-      //         </>
-      //       )}
-      //     </div>
-      //   );
+      case "telegramToggleAndPost":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <NumberInput
+                  lable={"How many messages/posts to interact?"}
+                  min={0}
+                  Value={el.numberOfMessages || 0}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 0;
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      n,
+                      "numberOfMessages"
+                    );
+                    setInputs((prevState) => {
+                      const newInputs = { ...prevState };
+                      const item = newInputs.inputs[index].inputs[InnerIndex];
+                      let messages = Array.isArray(item.messages)
+                        ? item.messages
+                        : [];
+                      if (n > messages.length) {
+                        for (let i = messages.length; i < n; i++) {
+                          messages.push({
+                            url: "",
+                            keyword: "",
+                            like: false,
+                            comment: false,
+                            share: false,
+                            reply: "",
+                            shareGroups: "",
+                            report: false,
+                          });
+                        }
+                      } else if (n < messages.length) {
+                        messages = messages.slice(0, n);
+                      }
+                      item.messages = messages;
+                      item.numberOfMessages = n;
+                      return newInputs;
+                    });
+                  }}
+                />
+                {Array.isArray(el.messages) && el.messages.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {el.messages.map((msg, mIdx) => (
+                      <div
+                        key={mIdx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 10,
+                            fontWeight: 600,
+                            color: "#fff",
+                          }}
+                        >
+                          Message #{mIdx + 1}
+                        </div>
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 15,
+                          }}
+                        >
+                          <div style={{ marginTop: 5 }}>
+                            <InputText
+                              label={"Message/URL:"}
+                              type={"text"}
+                              placeholder={"Enter message or URL to interact"}
+                              name={`message_url_${mIdx}`}
+                              handler={(val) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.messages = Array.isArray(item.messages)
+                                    ? item.messages
+                                    : [];
+                                  item.messages[mIdx] = item.messages[mIdx] || {
+                                    url: "",
+                                    keyword: "",
+                                    like: false,
+                                    comment: false,
+                                    share: false,
+                                    report: false,
+                                    reply: "",
+                                    shareGroups: "",
+                                  };
+                                  item.messages[mIdx].url = val;
+                                  return newInputs;
+                                });
+                              }}
+                              isTaskInputs={true}
+                              value={msg.url || ""}
+                            />
+                          </div>
+                          <div style={{ marginTop: 5 }}>
+                            <InputText
+                              label={"Keyword:"}
+                              type={"text"}
+                              placeholder={"Enter keyword"}
+                              name={`keyword_${mIdx}`}
+                              handler={(val) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.messages = Array.isArray(item.messages)
+                                    ? item.messages
+                                    : [];
+                                  item.messages[mIdx] = item.messages[mIdx] || {
+                                    url: "",
+                                    keyword: "",
+                                    like: false,
+                                    comment: false,
+                                    share: false,
+                                    report: false,
+                                    reply: "",
+                                    shareGroups: "",
+                                  };
+                                  item.messages[mIdx].keyword = val;
+                                  return newInputs;
+                                });
+                              }}
+                              isTaskInputs={true}
+                              value={msg.keyword || ""}
+                            />
+                          </div>
+                          <div
+                            style={{
+                              marginTop: 5,
+                              fontWeight: 500,
+                              color: "#fff",
+                            }}
+                          >
+                            Actions:
+                          </div>
+                          <div
+                            style={{ display: "flex", gap: 60, marginTop: 0 }}
+                          >
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!msg.like}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      report: false,
+                                      reply: "",
+                                      shareGroups: "",
+                                    };
+                                    item.messages[mIdx].like = checked;
+                                    return newInputs;
+                                  });
+                                }}
+                              />
+                              Like
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!msg.comment}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      report: false,
+                                      reply: "",
+                                      shareGroups: "",
+                                    };
+                                    item.messages[mIdx].comment = checked;
+                                    return newInputs;
+                                  });
+                                }}
+                              />
+                              Comment
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!msg.share}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      report: false,
+                                      reply: "",
+                                      shareGroups: "",
+                                    };
+                                    item.messages[mIdx].share = checked;
+                                    return newInputs;
+                                  });
+                                }}
+                              />
+                              Share
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!msg.report}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      report: false,
+                                      reply: "",
+                                      shareGroups: "",
+                                    };
+                                    item.messages[mIdx].report = checked;
+                                    return newInputs;
+                                  });
+                                }}
+                              />
+                              Report
+                            </label>
+                          </div>
+                        </div>
+                        {/* Show reply input if comment is checked */}
+                        {msg.comment && (
+                          <div style={{ marginTop: 15 }}>
+                            <InputText
+                              label={"Reply to post:"}
+                              type={"text"}
+                              placeholder={"Enter reply text"}
+                              name={`reply_${mIdx}`}
+                              handler={(val) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.messages = Array.isArray(item.messages)
+                                    ? item.messages
+                                    : [];
+                                  item.messages[mIdx] = item.messages[mIdx] || {
+                                    url: "",
+                                    keyword: "",
+                                    like: false,
+                                    comment: false,
+                                    share: false,
+                                    reply: "",
+                                    report: false,
+                                    shareGroups: "",
+                                  };
+                                  item.messages[mIdx].reply = val;
+                                  return newInputs;
+                                });
+                              }}
+                              isTaskInputs={true}
+                              value={msg.reply || ""}
+                            />
+                          </div>
+                        )}
+                        {/* Show group names input if share is checked */}
+                        {msg.share && (
+                          <div style={{ marginTop: 15 }}>
+                            <InputText
+                              label={"Groups to share in (comma separated):"}
+                              type={"text"}
+                              placeholder={
+                                "Enter group names, separated by commas"
+                              }
+                              name={`shareGroups_${mIdx}`}
+                              handler={(val) => {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.messages = Array.isArray(item.messages)
+                                    ? item.messages
+                                    : [];
+                                  item.messages[mIdx] = item.messages[mIdx] || {
+                                    url: "",
+                                    keyword: "",
+                                    like: false,
+                                    comment: false,
+                                    share: false,
+                                    reply: "",
+                                    report: false,
+                                    shareGroups: "",
+                                  };
+                                  item.messages[mIdx].shareGroups = val;
+                                  return newInputs;
+                                });
+                              }}
+                              isTaskInputs={true}
+                              value={msg.shareGroups || ""}
+                            />
+                          </div>
+                        )}
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+      case "telegramToggleAndPostShare":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <InputText
+                  label={"Enter the URL of the group:"}
+                  type={"text"}
+                  placeholder={"Place URL here"}
+                  name={"group_link"}
+                  handler={(val) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      val,
+                      "group_link"
+                    );
+                  }}
+                  isTaskInputs={true}
+                  value={el.group_link}
+                />
+                <InputText
+                  label={"Enter the Prompt for the message here:"}
+                  type={"text"}
+                  placeholder={"Place prompt here"}
+                  name={"prompt"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "prompt");
+                  }}
+                  isTaskInputs={true}
+                  value={el.prompt}
+                />
+                <InputText
+                  label={"Groups to share in (comma separated):"}
+                  type={"text"}
+                  placeholder={"Enter group names, separated by commas"}
+                  name={"shareGroups"}
+                  handler={(val) => {
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      val,
+                      "shareGroups"
+                    );
+                  }}
+                  isTaskInputs={true}
+                  value={el.shareGroups || ""}
+                />
+              </>
+            )}
+          </div>
+        );
+      case "telegramToggleAndReport":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <InputText
+                  label={"Enter the Username to report:"}
+                  type={"text"}
+                  placeholder={"Place username here"}
+                  name={"username"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "username");
+                  }}
+                  isTaskInputs={true}
+                  value={el.username}
+                />
+                <NumberInput
+                  lable={"Number of reports:"}
+                  min={1}
+                  Value={el.reportsPerDay || 1}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 1;
+                    inputTextChangeHandler(
+                      index,
+                      InnerIndex,
+                      n,
+                      "reportsPerDay"
+                    );
+                  }}
+                />
+              </>
+            )}
+          </div>
+        );
       default:
         return <p>Unknown input type</p>;
     }

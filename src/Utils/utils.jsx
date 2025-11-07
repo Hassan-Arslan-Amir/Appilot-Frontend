@@ -590,6 +590,10 @@ export function transformData(data) {
       telegramToggleAndURL: ["telegram_group_urls"],
 
       telegramToggleAndPost: ["messages"],
+
+      telegramToggleAndPostShare: ["prompt", "shareGroups", "group_link"],
+
+      telegramToggleAndReport: ["username", "reportsPerDay"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today
