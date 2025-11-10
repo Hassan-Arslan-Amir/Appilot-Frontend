@@ -35,6 +35,8 @@ function Save({ task, saveHandler, devicesNavigator, disabled }) {
       case "telegramtoggleandpost":
       case "telegramtoggleandpostshare":
       case "telegramtoggleandreport":
+      case "youtubeandmultiaccounts":
+      case "spotifyandmultiaccounts":    
         return el.input ? <Tick class="greenCheck" /> : <Cut class="redCut" />;
       default:
         return String(el.input);
