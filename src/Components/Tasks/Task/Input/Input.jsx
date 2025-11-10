@@ -2058,6 +2058,997 @@ function Input(props) {
       //     )}
       //   </div>
       // );
+      case "toggleAndAPI":
+        return (
+          <div className={classes.Inputscontainer}>
+            {el.input && (
+              <InputText
+                label={"Enter API Key of OpenAI:"}
+                type={"text"}
+                placeholder={"Place API Key here"}
+                name={"api_key"}
+                handler={(val) => {
+                  inputTextChangeHandler(index, InnerIndex, val, "api_key");
+                }}
+                isTaskInputs={true}
+                value={el.api_key}
+              />
+            )}
+          </div>
+        );
+      case "toggleAndMultiAccounts":
+        return (
+          <div className={classes.Inputscontainer}>
+            {/* Main toggle for MultiAccounts uses parent indices */}
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={inputsToggleChangeHandler}
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                <div className={classes.addbuttonInputContainer}>
+                  <InputWithButton
+                    lable={"Enter Username"}
+                    type="text"
+                    name="accountUsername"
+                    buttonText="Add"
+                    handler={(value) => {
+                      if (value.trim() === "") {
+                        failToast("Please enter username");
+                        return;
+                      } else if (
+                        el.MultiAccounts.some(
+                          (acc) => acc.username === value.trim()
+                        )
+                      ) {
+                        failToast("Username already exists");
+                        return;
+                      } else {
+                        setInputs((prev) => {
+                          const newInputs = { ...prev };
+                          const item =
+                            newInputs.inputs[index].inputs[InnerIndex];
+                          item.MultiAccounts = [
+                            ...(item.MultiAccounts || []),
+                            {
+                              username: value.trim(),
+                              activities: [
+                                {
+                                  type: "toggleAndInput",
+                                  name: "Profile interaction using Usernames",
+                                  description:
+                                    "The bot will search for the specific usernames and interact with the posts of the profile.",
+                                  input: false,
+                                  posts: [],
+                                  numberOfPosts: 0,
+                                },
+                                {
+                                  type: "toggleAndURL",
+                                  name: "Join the Twitter Space",
+                                  description:
+                                    "The bot will join the Twitter Space using the URL.",
+                                  input: false,
+                                  space_link: "",
+                                  space_duration: 5,
+                                },
+                                {
+                                  type: "toggleAndPrompt",
+                                  name: "Post a new Tweet",
+                                  description:
+                                    "The bot will type and post a new Tweet using a prompt.",
+                                  input: false,
+                                  prompt: "",
+                                },
+                                {
+                                  type: "toggleAndRetweet",
+                                  name: "Interact with specific Tweets",
+                                  description:
+                                    "The bot will interact with the specific Tweets using the URLs.",
+                                  input: false,
+                                  tweetData: [],
+                                  numberOfTweets: 0,
+                                },
+                              ],
+                            },
+                          ];
+                          return newInputs;
+                        });
+                      }
+                    }}
+                  />
+                </div>
+                {el.MultiAccounts && el.MultiAccounts.length !== 0 && (
+                  <>
+                    {el.MultiAccounts.map((account, accountIndex) => {
+                      const isOpen = openDropdowns[accountIndex];
+                      return (
+                        <div
+                          className={classes.accountContainer}
+                          key={accountIndex}
+                        >
+                          <div className={classes.accountHeaderContainer}>
+                            <h6 className={classes.accountUsername}>
+                              {account.username}
+                            </h6>
+                            <div className={classes.accountActions}>
+                              <button
+                                className={classes.removeAccountBtn}
+                                onClick={() => {
+                                  setInputs((prev) => {
+                                    const newInputs = { ...prev };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.MultiAccounts =
+                                      item.MultiAccounts.filter(
+                                        (_, i) => i !== accountIndex
+                                      );
+                                    return newInputs;
+                                  });
+                                }}
+                                aria-label="Remove account"
+                              >
+                                {/* Use your Cross icon component if available */}
+                                <Cross />
+                              </button>
+                              <button
+                                className={`${classes.accordionButton} ${
+                                  isOpen ? classes.opened : ""
+                                }`}
+                                onClick={() => {
+                                  setOpenDropdowns((prev) => ({
+                                    ...prev,
+                                    [accountIndex]: !prev[accountIndex],
+                                  }));
+                                }}
+                                aria-label={isOpen ? "Collapse" : "Expand"}
+                              >
+                                {isOpen ? (
+                                  <CustomChevronUp />
+                                ) : (
+                                  <CustomChevronDown />
+                                )}
+                              </button>
+                            </div>
+                          </div>
+                          {isOpen && (
+                            <div className={classes.accordionContent}>
+                              <p className={classes.setInputsHeading}>
+                                Please set Inputs for this account:
+                              </p>
+                              {account.activities.map((activity, actIdx) => (
+                                <div
+                                  key={actIdx}
+                                  className={classes.inputWrapper}
+                                >
+                                  <div className={classes.descriptionContainer}>
+                                    <p>{activity.description}</p>
+                                  </div>
+                                  <div className={classes.inputCont}>
+                                    {/* Activity toggles use accountIndex and actIdx for correct state */}
+                                    {renderInputContent(
+                                      activity,
+                                      index,
+                                      InnerIndex,
+                                      {
+                                        isMultiAccountActivity: true,
+                                        parentIndex: index,
+                                        accountIndex,
+                                        actIdx,
+                                      }
+                                    )}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      );
+                    })}
+                  </>
+                )}
+              </>
+            )}
+          </div>
+        );
+      // case "toggleAndFollowUnfollow":
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       <ToggleInput
+      //         el={el}
+      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
+      //         index={index}
+      //         InnerIndex={InnerIndex}
+      //       />
+      //       {el.input && (
+      //         <>
+      //           <InputText
+      //             label={
+      //               "Enter a list of profile usernames you want to follow/unfollow:"
+      //             }
+      //             type={"text"}
+      //             placeholder={"Place usernames here"}
+      //             name={"usernames"}
+      //             handler={(val) => {
+      //               inputTextChangeHandler(index, InnerIndex, val, "usernames");
+      //             }}
+      //             isTaskInputs={true}
+      //             value={el.usernames}
+      //           />
+      //           <NumberInput
+      //             lable={"Number of users to follow/unfollow per day:"}
+      //             onChange={(value) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 value,
+      //                 "usersPerDay"
+      //               );
+      //             }}
+      //             min={0}
+      //             Value={el.usersPerDay || ""}
+      //           />
+      //           <RadioOptions
+      //             options={["Follow", "Unfollow"]}
+      //             description={"Select action:"}
+      //             value={el.followAction}
+      //             handler={(val) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 val,
+      //                 "followAction"
+      //               );
+      //             }}
+      //             name={`followAction_${index}_${InnerIndex}`}
+      //           />
+      //         </>
+      //       )}
+      //     </div>
+      //   );
+      // case "toggleAndProbability":
+      //   if (!el.date) {
+      //     setInputs((prevState) => {
+      //       const newInputs = { ...prevState };
+      //       newInputs.inputs[index].inputs[InnerIndex] = {
+      //         ...el,
+      //         date: getTodayDDMMYYYY(),
+      //       };
+      //       return newInputs;
+      //     });
+      //   }
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       <ToggleInput
+      //         el={el}
+      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
+      //         index={index}
+      //         InnerIndex={InnerIndex}
+      //       />
+      //       {el.input && (
+      //         <>
+      //           <div style={{ marginTop: 10 }}>
+      //             <label style={{ fontWeight: 500, color: "#fff" }}>
+      //               Date:
+      //             </label>
+      //             <input
+      //               type="text"
+      //               value={el.date || getTodayDDMMYYYY()}
+      //               onChange={(e) => {
+      //                 inputTextChangeHandler(
+      //                   index,
+      //                   InnerIndex,
+      //                   e.target.value,
+      //                   "date"
+      //                 );
+      //               }}
+      //               readOnly={false}
+      //               style={{
+      //                 marginLeft: 8,
+      //                 padding: 4,
+      //                 borderRadius: 4,
+      //                 border: "1px solid #000",
+      //                 width: 120,
+      //                 backgroundColor: "#000",
+      //                 color: "#fff",
+      //               }}
+      //             />
+      //           </div>
+      //           <NumberInput
+      //             lable={"Probability:"}
+      //             onChange={(value) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 value,
+      //                 "probability"
+      //               );
+      //             }}
+      //             min={0}
+      //             Value={el.probability}
+      //           />
+      //           <NumberInput
+      //             lable={"Number of Tweets to Interact Daily:"}
+      //             onChange={(value) => {
+      //               inputTextChangeHandler(
+      //                 index,
+      //                 InnerIndex,
+      //                 value,
+      //                 "tweetsPerDay"
+      //               );
+      //             }}
+      //             min={0}
+      //             Value={el.tweetsPerDay}
+      //           />
+      //         </>
+      //       )}
+      //       {/* Always render the date field (hidden) so it's sent to backend even if toggle is off */}
+      //       <input
+      //         type="hidden"
+      //         value={el.date || getTodayDDMMYYYY()}
+      //         readOnly
+      //         name="date"
+      //       />
+      //     </div>
+      //   );
+
+      // ------------------ Inputs for Spotify Bot ----------------------------------- //
+      case "toggleAndSpotify":
+        return (
+          <div className={classes.Inputscontainer}>
+            <ToggleInput
+              el={el}
+              inputsToggleChangeHandler={(idx, innerIdx) =>
+                options.isMultiAccountActivity
+                  ? inputsToggleChangeHandler(idx, innerIdx, options)
+                  : inputsToggleChangeHandler(idx, innerIdx)
+              }
+              index={index}
+              InnerIndex={InnerIndex}
+            />
+            {el.input && (
+              <>
+                {/* Number of albums to interact with */}
+                <NumberInput
+                  lable={"How many Spotify albums?"}
+                  onChange={(value) => {
+                    const n = parseInt(value) || 0;
+                    if (options.isMultiAccountActivity) {
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item =
+                          newInputs.inputs[options.parentIndex].inputs[
+                            InnerIndex
+                          ].MultiAccounts[options.accountIndex].activities[
+                            options.actIdx
+                          ];
+                        let albums = Array.isArray(item.albums)
+                          ? item.albums
+                          : [];
+                        if (n > albums.length) {
+                          for (let i = albums.length; i < n; i++) {
+                            albums.push({
+                              spotify_link: "",
+                              prompt: "",
+                              playDuration: 0,
+                              share: false,
+                            });
+                          }
+                        } else if (n < albums.length) {
+                          albums = albums.slice(0, n);
+                        }
+                        item.albums = albums;
+                        item.numberOfAlbums = n;
+                        return newInputs;
+                      });
+                    } else {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        n,
+                        "numberOfAlbums"
+                      );
+                      setInputs((prevState) => {
+                        const newInputs = { ...prevState };
+                        const item = newInputs.inputs[index].inputs[InnerIndex];
+                        let albums = Array.isArray(item.albums)
+                          ? item.albums
+                          : [];
+                        if (n > albums.length) {
+                          for (let i = albums.length; i < n; i++) {
+                            albums.push({
+                              spotify_link: "",
+                              prompt: "",
+                              playDuration: 0,
+                              share: false,
+                            });
+                          }
+                        } else if (n < albums.length) {
+                          albums = albums.slice(0, n);
+                        }
+                        item.albums = albums;
+                        item.numberOfAlbums = n;
+                        return newInputs;
+                      });
+                    }
+                  }}
+                  min={0}
+                  Value={el.numberOfAlbums || ""}
+                />
+                {Array.isArray(el.albums) && el.albums.length > 0 && (
+                  <div style={{ marginTop: 12 }}>
+                    {el.albums.map((album, aIdx) => (
+                      <div
+                        key={aIdx}
+                        style={{
+                          border: "1px solid #444",
+                          borderRadius: 8,
+                          padding: 12,
+                          marginBottom: 12,
+                        }}
+                      >
+                        <div
+                          style={{
+                            marginBottom: 8,
+                            fontWeight: 500,
+                            color: "#fff",
+                          }}
+                        >
+                          Album #{aIdx + 1}
+                        </div>
+
+                        <div
+                          style={{
+                            display: "flex",
+                            flexDirection: "column",
+                            gap: 12,
+                          }}
+                        >
+                          {/* 1. Track URL input */}
+                          <InputText
+                            label={"Track URL:"}
+                            type={"text"}
+                            placeholder={"Enter Spotify track URL"}
+                            name={`spotify_link_${aIdx}`}
+                            handler={(val) => {
+                              if (options.isMultiAccountActivity) {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const activity =
+                                    newInputs.inputs[options.parentIndex]
+                                      .inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx];
+                                  activity.albums = Array.isArray(
+                                    activity.albums
+                                  )
+                                    ? activity.albums
+                                    : [];
+                                  activity.albums[aIdx] = activity.albums[
+                                    aIdx
+                                  ] || {
+                                    spotify_link: "",
+                                    prompt: "",
+                                    playDuration: 0,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
+                                  };
+                                  activity.albums[aIdx].spotify_link = val;
+                                  return newInputs;
+                                });
+                              } else {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.albums = Array.isArray(item.albums)
+                                    ? item.albums
+                                    : [];
+                                  item.albums[aIdx] = item.albums[aIdx] || {
+                                    spotify_link: "",
+                                    prompt: "",
+                                    playDuration: 0,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
+                                  };
+                                  item.albums[aIdx].spotify_link = val;
+                                  return newInputs;
+                                });
+                              }
+                            }}
+                            isTaskInputs={true}
+                            value={album.spotify_link}
+                          />
+
+                          {/* 2. Duration input */}
+                          <NumberInput
+                            lable={"Play duration (minutes):"}
+                            placeholder={"Enter play duration in minutes"}
+                            onChange={(value) => {
+                              const v = parseInt(value) || 0;
+                              if (options.isMultiAccountActivity) {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const activity =
+                                    newInputs.inputs[options.parentIndex]
+                                      .inputs[InnerIndex].MultiAccounts[
+                                      options.accountIndex
+                                    ].activities[options.actIdx];
+                                  activity.albums = Array.isArray(
+                                    activity.albums
+                                  )
+                                    ? activity.albums
+                                    : [];
+                                  activity.albums[aIdx] = activity.albums[
+                                    aIdx
+                                  ] || {
+                                    spotify_link: "",
+                                    prompt: "",
+                                    playDuration: 0,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
+                                  };
+                                  activity.albums[aIdx].playDuration = v;
+                                  return newInputs;
+                                });
+                              } else {
+                                setInputs((prevState) => {
+                                  const newInputs = { ...prevState };
+                                  const item =
+                                    newInputs.inputs[index].inputs[InnerIndex];
+                                  item.albums = Array.isArray(item.albums)
+                                    ? item.albums
+                                    : [];
+                                  item.albums[aIdx] = item.albums[aIdx] || {
+                                    spotify_link: "",
+                                    prompt: "",
+                                    playDuration: 0,
+                                    addToLibrary: false,
+                                    followArtist: false,
+                                    shareOnTwitter: false,
+                                  };
+                                  item.albums[aIdx].playDuration = v;
+                                  return newInputs;
+                                });
+                              }
+                            }}
+                            min={0}
+                            Value={album.playDuration || ""}
+                          />
+                          {/* 3. Actions checkboxes */}
+                          <div
+                            style={{ display: "flex", gap: 24, marginTop: 8 }}
+                          >
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!album.addToLibrary}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.albums = Array.isArray(
+                                        activity.albums
+                                      )
+                                        ? activity.albums
+                                        : [];
+                                      activity.albums[aIdx] = activity.albums[
+                                        aIdx
+                                      ] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      activity.albums[aIdx].addToLibrary =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.albums = Array.isArray(item.albums)
+                                        ? item.albums
+                                        : [];
+                                      item.albums[aIdx] = item.albums[aIdx] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      item.albums[aIdx].addToLibrary = checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Add to Library
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!album.followArtist}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.albums = Array.isArray(
+                                        activity.albums
+                                      )
+                                        ? activity.albums
+                                        : [];
+                                      activity.albums[aIdx] = activity.albums[
+                                        aIdx
+                                      ] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      activity.albums[aIdx].followArtist =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.albums = Array.isArray(item.albums)
+                                        ? item.albums
+                                        : [];
+                                      item.albums[aIdx] = item.albums[aIdx] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      item.albums[aIdx].followArtist = checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Follow Artist
+                            </label>
+                            <label
+                              style={{
+                                color: "#fff",
+                                display: "flex",
+                                alignItems: "center",
+                                gap: 8,
+                              }}
+                            >
+                              <input
+                                type="checkbox"
+                                checked={!!album.shareOnTwitter}
+                                onChange={(e) => {
+                                  const checked = e.target.checked;
+                                  if (options.isMultiAccountActivity) {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const activity =
+                                        newInputs.inputs[options.parentIndex]
+                                          .inputs[InnerIndex].MultiAccounts[
+                                          options.accountIndex
+                                        ].activities[options.actIdx];
+                                      activity.albums = Array.isArray(
+                                        activity.albums
+                                      )
+                                        ? activity.albums
+                                        : [];
+                                      activity.albums[aIdx] = activity.albums[
+                                        aIdx
+                                      ] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      activity.albums[aIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  } else {
+                                    setInputs((prevState) => {
+                                      const newInputs = { ...prevState };
+                                      const item =
+                                        newInputs.inputs[index].inputs[
+                                          InnerIndex
+                                        ];
+                                      item.albums = Array.isArray(item.albums)
+                                        ? item.albums
+                                        : [];
+                                      item.albums[aIdx] = item.albums[aIdx] || {
+                                        spotify_link: "",
+                                        prompt: "",
+                                        playDuration: 0,
+                                        addToLibrary: false,
+                                        followArtist: false,
+                                        shareOnTwitter: false,
+                                      };
+                                      item.albums[aIdx].shareOnTwitter =
+                                        checked;
+                                      return newInputs;
+                                    });
+                                  }
+                                }}
+                              />
+                              Share on Twitter
+                            </label>
+                          </div>
+                          {/* Show prompt input if Share on Twitter is checked */}
+                          {album.shareOnTwitter && (
+                            <InputText
+                              label={"Prompt / Notes:"}
+                              type={"text"}
+                              placeholder={"Enter prompt or instructions"}
+                              name={`spotify_prompt_${aIdx}`}
+                              handler={(val) => {
+                                if (options.isMultiAccountActivity) {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const activity =
+                                      newInputs.inputs[options.parentIndex]
+                                        .inputs[InnerIndex].MultiAccounts[
+                                        options.accountIndex
+                                      ].activities[options.actIdx];
+                                    activity.albums = Array.isArray(
+                                      activity.albums
+                                    )
+                                      ? activity.albums
+                                      : [];
+                                    activity.albums[aIdx] = activity.albums[
+                                      aIdx
+                                    ] || {
+                                      spotify_link: "",
+                                      prompt: "",
+                                      playDuration: 0,
+                                      addToLibrary: false,
+                                      followArtist: false,
+                                      shareOnTwitter: false,
+                                    };
+                                    activity.albums[aIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                } else {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.albums = Array.isArray(item.albums)
+                                      ? item.albums
+                                      : [];
+                                    item.albums[aIdx] = item.albums[aIdx] || {
+                                      spotify_link: "",
+                                      prompt: "",
+                                      playDuration: 0,
+                                      addToLibrary: false,
+                                      followArtist: false,
+                                      shareOnTwitter: false,
+                                    };
+                                    item.albums[aIdx].prompt = val;
+                                    return newInputs;
+                                  });
+                                }
+                              }}
+                              isTaskInputs={true}
+                              value={album.prompt || ""}
+                            />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </>
+            )}
+          </div>
+        );
+      // case "spotifyAndMultiAccounts":
+      //   return (
+      //     <div className={classes.Inputscontainer}>
+      //       {/* Main toggle for MultiAccounts uses parent indices */}
+      //       <ToggleInput
+      //         el={el}
+      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
+      //         index={index}
+      //         InnerIndex={InnerIndex}
+      //       />
+      //       {el.input && (
+      //         <>
+      //           <div className={classes.addbuttonInputContainer}>
+      //             <InputWithButton
+      //               lable={"Enter Username"}
+      //               type="text"
+      //               name="accountUsername"
+      //               buttonText="Add"
+      //               handler={(value) => {
+      //                 if (value.trim() === "") {
+      //                   failToast("Please enter username");
+      //                   return;
+      //                 } else if (
+      //                   el.MultiAccounts.some(
+      //                     (acc) => acc.username === value.trim()
+      //                   )
+      //                 ) {
+      //                   failToast("Username already exists");
+      //                   return;
+      //                 } else {
+      //                   setInputs((prev) => {
+      //                     const newInputs = { ...prev };
+      //                     const item =
+      //                       newInputs.inputs[index].inputs[InnerIndex];
+      //                     item.MultiAccounts = [
+      //                       ...(item.MultiAccounts || []),
+      //                       {
+      //                         username: value.trim(),
+      //                         activities: [
+      //                           {
+      //                             type: "toggleAndSpotify",
+      //                             name: "Interact and Share a Spotify track",
+      //                             description:
+      //                               "The bot will interact with a Spotify track using a URL and share the link by posting a new tweet.",
+      //                             input: false,
+      //                             spotify_link: "",
+      //                             prompt: "",
+      //                           },
+      //                         ],
+      //                       },
+      //                     ];
+      //                     return newInputs;
+      //                   });
+      //                 }
+      //               }}
+      //             />
+      //           </div>
+      //           {el.MultiAccounts && el.MultiAccounts.length !== 0 && (
+      //             <>
+      //               {el.MultiAccounts.map((account, accountIndex) => {
+      //                 const isOpen = openDropdowns[accountIndex];
+      //                 return (
+      //                   <div
+      //                     className={classes.accountContainer}
+      //                     key={accountIndex}
+      //                   >
+      //                     <div className={classes.accountHeaderContainer}>
+      //                       <h6 className={classes.accountUsername}>
+      //                         {account.username}
+      //                       </h6>
+      //                       <div className={classes.accountActions}>
+      //                         <button
+      //                           className={classes.removeAccountBtn}
+      //                           onClick={() => {
+      //                             setInputs((prev) => {
+      //                               const newInputs = { ...prev };
+      //                               const item =
+      //                                 newInputs.inputs[index].inputs[
+      //                                   InnerIndex
+      //                                 ];
+      //                               item.MultiAccounts =
+      //                                 item.MultiAccounts.filter(
+      //                                   (_, i) => i !== accountIndex
+      //                                 );
+      //                               return newInputs;
+      //                             });
+      //                           }}
+      //                           aria-label="Remove account"
+      //                         >
+      //                           {/* Use your Cross icon component if available */}
+      //                           <Cross />
+      //                         </button>
+      //                         <button
+      //                           className={`${classes.accordionButton} ${
+      //                             isOpen ? classes.opened : ""
+      //                           }`}
+      //                           onClick={() => {
+      //                             setOpenDropdowns((prev) => ({
+      //                               ...prev,
+      //                               [accountIndex]: !prev[accountIndex],
+      //                             }));
+      //                           }}
+      //                           aria-label={isOpen ? "Collapse" : "Expand"}
+      //                         >
+      //                           {isOpen ? (
+      //                             <CustomChevronUp />
+      //                           ) : (
+      //                             <CustomChevronDown />
+      //                           )}
+      //                         </button>
+      //                       </div>
+      //                     </div>
+      //                     {isOpen && (
+      //                       <div className={classes.accordionContent}>
+      //                         <p className={classes.setInputsHeading}>
+      //                           Please set Inputs for this account:
+      //                         </p>
+      //                         {account.activities.map((activity, actIdx) => (
+      //                           <div
+      //                             key={actIdx}
+      //                             className={classes.inputWrapper}
+      //                           >
+      //                             <div className={classes.descriptionContainer}>
+      //                               <p>{activity.description}</p>
+      //                             </div>
+      //                             <div className={classes.inputCont}>
+      //                               {/* Activity toggles use accountIndex and actIdx for correct state */}
+      //                               {renderInputContent(
+      //                                 activity,
+      //                                 index,
+      //                                 InnerIndex,
+      //                                 {
+      //                                   isMultiAccountActivity: true,
+      //                                   parentIndex: index,
+      //                                   accountIndex,
+      //                                   actIdx,
+      //                                 }
+      //                               )}
+      //                             </div>
+      //                           </div>
+      //                         ))}
+      //                       </div>
+      //                     )}
+      //                   </div>
+      //                 );
+      //               })}
+      //             </>
+      //           )}
+      //         </>
+      //       )}
+      //     </div>
+      //   );
+
+      // ------------------ Inputs for YouTube Bot ----------------------------------- //
       case "toggleAndYoutube":
         return (
           <div className={classes.Inputscontainer}>
@@ -2643,706 +3634,10 @@ function Input(props) {
             )}
           </div>
         );
-      case "toggleAndSpotify":
-        return (
-          <div className={classes.Inputscontainer}>
-            <ToggleInput
-              el={el}
-              inputsToggleChangeHandler={(idx, innerIdx) =>
-                options.isMultiAccountActivity
-                  ? inputsToggleChangeHandler(idx, innerIdx, options)
-                  : inputsToggleChangeHandler(idx, innerIdx)
-              }
-              index={index}
-              InnerIndex={InnerIndex}
-            />
-            {el.input && (
-              <>
-                {/* Number of albums to interact with */}
-                <NumberInput
-                  lable={"How many Spotify albums?"}
-                  onChange={(value) => {
-                    const n = parseInt(value) || 0;
-                    if (options.isMultiAccountActivity) {
-                      setInputs((prevState) => {
-                        const newInputs = { ...prevState };
-                        const item =
-                          newInputs.inputs[options.parentIndex].inputs[
-                            InnerIndex
-                          ].MultiAccounts[options.accountIndex].activities[
-                            options.actIdx
-                          ];
-                        let albums = Array.isArray(item.albums)
-                          ? item.albums
-                          : [];
-                        if (n > albums.length) {
-                          for (let i = albums.length; i < n; i++) {
-                            albums.push({
-                              spotify_link: "",
-                              prompt: "",
-                              playDuration: 0,
-                              share: false,
-                            });
-                          }
-                        } else if (n < albums.length) {
-                          albums = albums.slice(0, n);
-                        }
-                        item.albums = albums;
-                        item.numberOfAlbums = n;
-                        return newInputs;
-                      });
-                    } else {
-                      inputTextChangeHandler(
-                        index,
-                        InnerIndex,
-                        n,
-                        "numberOfAlbums"
-                      );
-                      setInputs((prevState) => {
-                        const newInputs = { ...prevState };
-                        const item = newInputs.inputs[index].inputs[InnerIndex];
-                        let albums = Array.isArray(item.albums)
-                          ? item.albums
-                          : [];
-                        if (n > albums.length) {
-                          for (let i = albums.length; i < n; i++) {
-                            albums.push({
-                              spotify_link: "",
-                              prompt: "",
-                              playDuration: 0,
-                              share: false,
-                            });
-                          }
-                        } else if (n < albums.length) {
-                          albums = albums.slice(0, n);
-                        }
-                        item.albums = albums;
-                        item.numberOfAlbums = n;
-                        return newInputs;
-                      });
-                    }
-                  }}
-                  min={0}
-                  Value={el.numberOfAlbums || ""}
-                />
-                {Array.isArray(el.albums) && el.albums.length > 0 && (
-                  <div style={{ marginTop: 12 }}>
-                    {el.albums.map((album, aIdx) => (
-                      <div
-                        key={aIdx}
-                        style={{
-                          border: "1px solid #444",
-                          borderRadius: 8,
-                          padding: 12,
-                          marginBottom: 12,
-                        }}
-                      >
-                        <div
-                          style={{
-                            marginBottom: 8,
-                            fontWeight: 500,
-                            color: "#fff",
-                          }}
-                        >
-                          Album #{aIdx + 1}
-                        </div>
-
-                        <div
-                          style={{
-                            display: "flex",
-                            flexDirection: "column",
-                            gap: 12,
-                          }}
-                        >
-                          {/* 1. Track URL input */}
-                          <InputText
-                            label={"Track URL:"}
-                            type={"text"}
-                            placeholder={"Enter Spotify track URL"}
-                            name={`spotify_link_${aIdx}`}
-                            handler={(val) => {
-                              if (options.isMultiAccountActivity) {
-                                setInputs((prevState) => {
-                                  const newInputs = { ...prevState };
-                                  const activity =
-                                    newInputs.inputs[options.parentIndex]
-                                      .inputs[InnerIndex].MultiAccounts[
-                                      options.accountIndex
-                                    ].activities[options.actIdx];
-                                  activity.albums = Array.isArray(
-                                    activity.albums
-                                  )
-                                    ? activity.albums
-                                    : [];
-                                  activity.albums[aIdx] = activity.albums[
-                                    aIdx
-                                  ] || {
-                                    spotify_link: "",
-                                    prompt: "",
-                                    playDuration: 0,
-                                    addToLibrary: false,
-                                    followArtist: false,
-                                    shareOnTwitter: false,
-                                  };
-                                  activity.albums[aIdx].spotify_link = val;
-                                  return newInputs;
-                                });
-                              } else {
-                                setInputs((prevState) => {
-                                  const newInputs = { ...prevState };
-                                  const item =
-                                    newInputs.inputs[index].inputs[InnerIndex];
-                                  item.albums = Array.isArray(item.albums)
-                                    ? item.albums
-                                    : [];
-                                  item.albums[aIdx] = item.albums[aIdx] || {
-                                    spotify_link: "",
-                                    prompt: "",
-                                    playDuration: 0,
-                                    addToLibrary: false,
-                                    followArtist: false,
-                                    shareOnTwitter: false,
-                                  };
-                                  item.albums[aIdx].spotify_link = val;
-                                  return newInputs;
-                                });
-                              }
-                            }}
-                            isTaskInputs={true}
-                            value={album.spotify_link}
-                          />
-
-                          {/* 2. Duration input */}
-                          <NumberInput
-                            lable={"Play duration (minutes):"}
-                            placeholder={"Enter play duration in minutes"}
-                            onChange={(value) => {
-                              const v = parseInt(value) || 0;
-                              if (options.isMultiAccountActivity) {
-                                setInputs((prevState) => {
-                                  const newInputs = { ...prevState };
-                                  const activity =
-                                    newInputs.inputs[options.parentIndex]
-                                      .inputs[InnerIndex].MultiAccounts[
-                                      options.accountIndex
-                                    ].activities[options.actIdx];
-                                  activity.albums = Array.isArray(
-                                    activity.albums
-                                  )
-                                    ? activity.albums
-                                    : [];
-                                  activity.albums[aIdx] = activity.albums[
-                                    aIdx
-                                  ] || {
-                                    spotify_link: "",
-                                    prompt: "",
-                                    playDuration: 0,
-                                    addToLibrary: false,
-                                    followArtist: false,
-                                    shareOnTwitter: false,
-                                  };
-                                  activity.albums[aIdx].playDuration = v;
-                                  return newInputs;
-                                });
-                              } else {
-                                setInputs((prevState) => {
-                                  const newInputs = { ...prevState };
-                                  const item =
-                                    newInputs.inputs[index].inputs[InnerIndex];
-                                  item.albums = Array.isArray(item.albums)
-                                    ? item.albums
-                                    : [];
-                                  item.albums[aIdx] = item.albums[aIdx] || {
-                                    spotify_link: "",
-                                    prompt: "",
-                                    playDuration: 0,
-                                    addToLibrary: false,
-                                    followArtist: false,
-                                    shareOnTwitter: false,
-                                  };
-                                  item.albums[aIdx].playDuration = v;
-                                  return newInputs;
-                                });
-                              }
-                            }}
-                            min={0}
-                            Value={album.playDuration || ""}
-                          />
-
-                          {/* 3. Actions checkboxes */}
-                          <div
-                            style={{ display: "flex", gap: 24, marginTop: 8 }}
-                          >
-                            <label
-                              style={{
-                                color: "#fff",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={!!album.addToLibrary}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  if (options.isMultiAccountActivity) {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const activity =
-                                        newInputs.inputs[options.parentIndex]
-                                          .inputs[InnerIndex].MultiAccounts[
-                                          options.accountIndex
-                                        ].activities[options.actIdx];
-                                      activity.albums = Array.isArray(
-                                        activity.albums
-                                      )
-                                        ? activity.albums
-                                        : [];
-                                      activity.albums[aIdx] = activity.albums[
-                                        aIdx
-                                      ] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      activity.albums[aIdx].addToLibrary =
-                                        checked;
-                                      return newInputs;
-                                    });
-                                  } else {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const item =
-                                        newInputs.inputs[index].inputs[
-                                          InnerIndex
-                                        ];
-                                      item.albums = Array.isArray(item.albums)
-                                        ? item.albums
-                                        : [];
-                                      item.albums[aIdx] = item.albums[aIdx] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      item.albums[aIdx].addToLibrary = checked;
-                                      return newInputs;
-                                    });
-                                  }
-                                }}
-                              />
-                              Add to Library
-                            </label>
-                            <label
-                              style={{
-                                color: "#fff",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={!!album.followArtist}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  if (options.isMultiAccountActivity) {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const activity =
-                                        newInputs.inputs[options.parentIndex]
-                                          .inputs[InnerIndex].MultiAccounts[
-                                          options.accountIndex
-                                        ].activities[options.actIdx];
-                                      activity.albums = Array.isArray(
-                                        activity.albums
-                                      )
-                                        ? activity.albums
-                                        : [];
-                                      activity.albums[aIdx] = activity.albums[
-                                        aIdx
-                                      ] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      activity.albums[aIdx].followArtist =
-                                        checked;
-                                      return newInputs;
-                                    });
-                                  } else {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const item =
-                                        newInputs.inputs[index].inputs[
-                                          InnerIndex
-                                        ];
-                                      item.albums = Array.isArray(item.albums)
-                                        ? item.albums
-                                        : [];
-                                      item.albums[aIdx] = item.albums[aIdx] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      item.albums[aIdx].followArtist = checked;
-                                      return newInputs;
-                                    });
-                                  }
-                                }}
-                              />
-                              Follow Artist
-                            </label>
-                            <label
-                              style={{
-                                color: "#fff",
-                                display: "flex",
-                                alignItems: "center",
-                                gap: 8,
-                              }}
-                            >
-                              <input
-                                type="checkbox"
-                                checked={!!album.shareOnTwitter}
-                                onChange={(e) => {
-                                  const checked = e.target.checked;
-                                  if (options.isMultiAccountActivity) {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const activity =
-                                        newInputs.inputs[options.parentIndex]
-                                          .inputs[InnerIndex].MultiAccounts[
-                                          options.accountIndex
-                                        ].activities[options.actIdx];
-                                      activity.albums = Array.isArray(
-                                        activity.albums
-                                      )
-                                        ? activity.albums
-                                        : [];
-                                      activity.albums[aIdx] = activity.albums[
-                                        aIdx
-                                      ] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      activity.albums[aIdx].shareOnTwitter =
-                                        checked;
-                                      return newInputs;
-                                    });
-                                  } else {
-                                    setInputs((prevState) => {
-                                      const newInputs = { ...prevState };
-                                      const item =
-                                        newInputs.inputs[index].inputs[
-                                          InnerIndex
-                                        ];
-                                      item.albums = Array.isArray(item.albums)
-                                        ? item.albums
-                                        : [];
-                                      item.albums[aIdx] = item.albums[aIdx] || {
-                                        spotify_link: "",
-                                        prompt: "",
-                                        playDuration: 0,
-                                        addToLibrary: false,
-                                        followArtist: false,
-                                        shareOnTwitter: false,
-                                      };
-                                      item.albums[aIdx].shareOnTwitter =
-                                        checked;
-                                      return newInputs;
-                                    });
-                                  }
-                                }}
-                              />
-                              Share on Twitter
-                            </label>
-                          </div>
-
-                          {/* Show prompt input if Share on Twitter is checked */}
-                          {album.shareOnTwitter && (
-                            <InputText
-                              label={"Prompt / Notes:"}
-                              type={"text"}
-                              placeholder={"Enter prompt or instructions"}
-                              name={`spotify_prompt_${aIdx}`}
-                              handler={(val) => {
-                                if (options.isMultiAccountActivity) {
-                                  setInputs((prevState) => {
-                                    const newInputs = { ...prevState };
-                                    const activity =
-                                      newInputs.inputs[options.parentIndex]
-                                        .inputs[InnerIndex].MultiAccounts[
-                                        options.accountIndex
-                                      ].activities[options.actIdx];
-                                    activity.albums = Array.isArray(
-                                      activity.albums
-                                    )
-                                      ? activity.albums
-                                      : [];
-                                    activity.albums[aIdx] = activity.albums[
-                                      aIdx
-                                    ] || {
-                                      spotify_link: "",
-                                      prompt: "",
-                                      playDuration: 0,
-                                      addToLibrary: false,
-                                      followArtist: false,
-                                      shareOnTwitter: false,
-                                    };
-                                    activity.albums[aIdx].prompt = val;
-                                    return newInputs;
-                                  });
-                                } else {
-                                  setInputs((prevState) => {
-                                    const newInputs = { ...prevState };
-                                    const item =
-                                      newInputs.inputs[index].inputs[
-                                        InnerIndex
-                                      ];
-                                    item.albums = Array.isArray(item.albums)
-                                      ? item.albums
-                                      : [];
-                                    item.albums[aIdx] = item.albums[aIdx] || {
-                                      spotify_link: "",
-                                      prompt: "",
-                                      playDuration: 0,
-                                      addToLibrary: false,
-                                      followArtist: false,
-                                      shareOnTwitter: false,
-                                    };
-                                    item.albums[aIdx].prompt = val;
-                                    return newInputs;
-                                  });
-                                }
-                              }}
-                              isTaskInputs={true}
-                              value={album.prompt || ""}
-                            />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </>
-            )}
-          </div>
-        );
-      case "toggleAndMultiAccounts":
-        return (
-          <div className={classes.Inputscontainer}>
-            {/* Main toggle for MultiAccounts uses parent indices */}
-            <ToggleInput
-              el={el}
-              inputsToggleChangeHandler={inputsToggleChangeHandler}
-              index={index}
-              InnerIndex={InnerIndex}
-            />
-            {el.input && (
-              <>
-                <div className={classes.addbuttonInputContainer}>
-                  <InputWithButton
-                    lable={"Enter Username"}
-                    type="text"
-                    name="accountUsername"
-                    buttonText="Add"
-                    handler={(value) => {
-                      if (value.trim() === "") {
-                        failToast("Please enter username");
-                        return;
-                      } else if (
-                        el.MultiAccounts.some(
-                          (acc) => acc.username === value.trim()
-                        )
-                      ) {
-                        failToast("Username already exists");
-                        return;
-                      } else {
-                        setInputs((prev) => {
-                          const newInputs = { ...prev };
-                          const item =
-                            newInputs.inputs[index].inputs[InnerIndex];
-                          item.MultiAccounts = [
-                            ...(item.MultiAccounts || []),
-                            {
-                              username: value.trim(),
-                              activities: [
-                                {
-                                  type: "toggleAndInput",
-                                  name: "Profile interaction using Usernames",
-                                  description:
-                                    "The bot will search for the specific usernames and interact with the posts of the profile.",
-                                  input: false,
-                                  posts: [],
-                                  numberOfPosts: 0,
-                                },
-                                {
-                                  type: "toggleAndURL",
-                                  name: "Join the Twitter Space",
-                                  description:
-                                    "The bot will join the Twitter Space using the URL.",
-                                  input: false,
-                                  space_link: "",
-                                  space_duration: 5,
-                                },
-                                {
-                                  type: "toggleAndPrompt",
-                                  name: "Post a new Tweet",
-                                  description:
-                                    "The bot will type and post a new Tweet using a prompt.",
-                                  input: false,
-                                  prompt: "",
-                                },
-                                {
-                                  type: "toggleAndRetweet",
-                                  name: "Interact with specific Tweets",
-                                  description:
-                                    "The bot will interact with the specific Tweets using the URLs.",
-                                  input: false,
-                                  tweetData: [],
-                                  numberOfTweets: 0,
-                                },
-                                // {
-                                //   type: "toggleAndYoutube",
-                                //   name: "Interact and Share a YouTube video",
-                                //   description:
-                                //     "The bot will interact with a YouTube video using a URL and share the link by posting a new tweet.",
-                                //   input: false,
-                                //   youtube_link: "",
-                                //   prompt: "",
-                                // },
-                                // {
-                                //   type: "toggleAndSpotify",
-                                //   name: "Interact and Share a Spotify track",
-                                //   description:
-                                //     "The bot will interact with a Spotify track using a URL and share the link by posting a new tweet.",
-                                //   input: false,
-                                //   spotify_link: "",
-                                //   prompt: "",
-                                // },
-                              ],
-                            },
-                          ];
-                          return newInputs;
-                        });
-                      }
-                    }}
-                  />
-                </div>
-                {el.MultiAccounts && el.MultiAccounts.length !== 0 && (
-                  <>
-                    {el.MultiAccounts.map((account, accountIndex) => {
-                      const isOpen = openDropdowns[accountIndex];
-                      return (
-                        <div
-                          className={classes.accountContainer}
-                          key={accountIndex}
-                        >
-                          <div className={classes.accountHeaderContainer}>
-                            <h6 className={classes.accountUsername}>
-                              {account.username}
-                            </h6>
-                            <div className={classes.accountActions}>
-                              <button
-                                className={classes.removeAccountBtn}
-                                onClick={() => {
-                                  setInputs((prev) => {
-                                    const newInputs = { ...prev };
-                                    const item =
-                                      newInputs.inputs[index].inputs[
-                                        InnerIndex
-                                      ];
-                                    item.MultiAccounts =
-                                      item.MultiAccounts.filter(
-                                        (_, i) => i !== accountIndex
-                                      );
-                                    return newInputs;
-                                  });
-                                }}
-                                aria-label="Remove account"
-                              >
-                                {/* Use your Cross icon component if available */}
-                                <Cross />
-                              </button>
-                              <button
-                                className={`${classes.accordionButton} ${
-                                  isOpen ? classes.opened : ""
-                                }`}
-                                onClick={() => {
-                                  setOpenDropdowns((prev) => ({
-                                    ...prev,
-                                    [accountIndex]: !prev[accountIndex],
-                                  }));
-                                }}
-                                aria-label={isOpen ? "Collapse" : "Expand"}
-                              >
-                                {isOpen ? (
-                                  <CustomChevronUp />
-                                ) : (
-                                  <CustomChevronDown />
-                                )}
-                              </button>
-                            </div>
-                          </div>
-                          {isOpen && (
-                            <div className={classes.accordionContent}>
-                              <p className={classes.setInputsHeading}>
-                                Please set Inputs for this account:
-                              </p>
-                              {account.activities.map((activity, actIdx) => (
-                                <div
-                                  key={actIdx}
-                                  className={classes.inputWrapper}
-                                >
-                                  <div className={classes.descriptionContainer}>
-                                    <p>{activity.description}</p>
-                                  </div>
-                                  <div className={classes.inputCont}>
-                                    {/* Activity toggles use accountIndex and actIdx for correct state */}
-                                    {renderInputContent(
-                                      activity,
-                                      index,
-                                      InnerIndex,
-                                      {
-                                        isMultiAccountActivity: true,
-                                        parentIndex: index,
-                                        accountIndex,
-                                        actIdx,
-                                      }
-                                    )}
-                                  </div>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
-                      );
-                    })}
-                  </>
-                )}
-              </>
-            )}
-          </div>
-        );
-      // case "toggleAndFollowUnfollow":
+      // case "youtubeAndMultiAccounts":
       //   return (
       //     <div className={classes.Inputscontainer}>
+      //       {/* Main toggle for MultiAccounts uses parent indices */}
       //       <ToggleInput
       //         el={el}
       //         inputsToggleChangeHandler={inputsToggleChangeHandler}
@@ -3351,151 +3646,144 @@ function Input(props) {
       //       />
       //       {el.input && (
       //         <>
-      //           <InputText
-      //             label={
-      //               "Enter a list of profile usernames you want to follow/unfollow:"
-      //             }
-      //             type={"text"}
-      //             placeholder={"Place usernames here"}
-      //             name={"usernames"}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(index, InnerIndex, val, "usernames");
-      //             }}
-      //             isTaskInputs={true}
-      //             value={el.usernames}
-      //           />
-      //           <NumberInput
-      //             lable={"Number of users to follow/unfollow per day:"}
-      //             onChange={(value) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 value,
-      //                 "usersPerDay"
-      //               );
-      //             }}
-      //             min={0}
-      //             Value={el.usersPerDay || ""}
-      //           />
-      //           <RadioOptions
-      //             options={["Follow", "Unfollow"]}
-      //             description={"Select action:"}
-      //             value={el.followAction}
-      //             handler={(val) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 val,
-      //                 "followAction"
-      //               );
-      //             }}
-      //             name={`followAction_${index}_${InnerIndex}`}
-      //           />
-      //         </>
-      //       )}
-      //     </div>
-      //   );
-      case "toggleAndAPI":
-        return (
-          <div className={classes.Inputscontainer}>
-            {el.input && (
-              <InputText
-                label={"Enter API Key of OpenAI:"}
-                type={"text"}
-                placeholder={"Place API Key here"}
-                name={"api_key"}
-                handler={(val) => {
-                  inputTextChangeHandler(index, InnerIndex, val, "api_key");
-                }}
-                isTaskInputs={true}
-                value={el.api_key}
-              />
-            )}
-          </div>
-        );
-      // case "toggleAndProbability":
-      //   if (!el.date) {
-      //     setInputs((prevState) => {
-      //       const newInputs = { ...prevState };
-      //       newInputs.inputs[index].inputs[InnerIndex] = {
-      //         ...el,
-      //         date: getTodayDDMMYYYY(),
-      //       };
-      //       return newInputs;
-      //     });
-      //   }
-      //   return (
-      //     <div className={classes.Inputscontainer}>
-      //       <ToggleInput
-      //         el={el}
-      //         inputsToggleChangeHandler={inputsToggleChangeHandler}
-      //         index={index}
-      //         InnerIndex={InnerIndex}
-      //       />
-      //       {el.input && (
-      //         <>
-      //           <div style={{ marginTop: 10 }}>
-      //             <label style={{ fontWeight: 500, color: "#fff" }}>
-      //               Date:
-      //             </label>
-      //             <input
+      //           <div className={classes.addbuttonInputContainer}>
+      //             <InputWithButton
+      //               lable={"Enter Username"}
       //               type="text"
-      //               value={el.date || getTodayDDMMYYYY()}
-      //               onChange={(e) => {
-      //                 inputTextChangeHandler(
-      //                   index,
-      //                   InnerIndex,
-      //                   e.target.value,
-      //                   "date"
-      //                 );
-      //               }}
-      //               readOnly={false}
-      //               style={{
-      //                 marginLeft: 8,
-      //                 padding: 4,
-      //                 borderRadius: 4,
-      //                 border: "1px solid #000",
-      //                 width: 120,
-      //                 backgroundColor: "#000",
-      //                 color: "#fff",
+      //               name="accountUsername"
+      //               buttonText="Add"
+      //               handler={(value) => {
+      //                 if (value.trim() === "") {
+      //                   failToast("Please enter username");
+      //                   return;
+      //                 } else if (
+      //                   el.MultiAccounts.some(
+      //                     (acc) => acc.username === value.trim()
+      //                   )
+      //                 ) {
+      //                   failToast("Username already exists");
+      //                   return;
+      //                 } else {
+      //                   setInputs((prev) => {
+      //                     const newInputs = { ...prev };
+      //                     const item =
+      //                       newInputs.inputs[index].inputs[InnerIndex];
+      //                     item.MultiAccounts = [
+      //                       ...(item.MultiAccounts || []),
+      //                       {
+      //                         username: value.trim(),
+      //                         activities: [
+      //                           {
+      //                             type: "toggleAndYoutube",
+      //                             name: "Interact and Share a YouTube video",
+      //                             description:
+      //                               "The bot will interact with a YouTube video using a URL and share the link by posting a new tweet.",
+      //                             input: false,
+      //                             youtube_link: "",
+      //                             prompt: "",
+      //                           },
+      //                         ],
+      //                       },
+      //                     ];
+      //                     return newInputs;
+      //                   });
+      //                 }
       //               }}
       //             />
       //           </div>
-      //           <NumberInput
-      //             lable={"Probability:"}
-      //             onChange={(value) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 value,
-      //                 "probability"
-      //               );
-      //             }}
-      //             min={0}
-      //             Value={el.probability}
-      //           />
-      //           <NumberInput
-      //             lable={"Number of Tweets to Interact Daily:"}
-      //             onChange={(value) => {
-      //               inputTextChangeHandler(
-      //                 index,
-      //                 InnerIndex,
-      //                 value,
-      //                 "tweetsPerDay"
-      //               );
-      //             }}
-      //             min={0}
-      //             Value={el.tweetsPerDay}
-      //           />
+      //           {el.MultiAccounts && el.MultiAccounts.length !== 0 && (
+      //             <>
+      //               {el.MultiAccounts.map((account, accountIndex) => {
+      //                 const isOpen = openDropdowns[accountIndex];
+      //                 return (
+      //                   <div
+      //                     className={classes.accountContainer}
+      //                     key={accountIndex}
+      //                   >
+      //                     <div className={classes.accountHeaderContainer}>
+      //                       <h6 className={classes.accountUsername}>
+      //                         {account.username}
+      //                       </h6>
+      //                       <div className={classes.accountActions}>
+      //                         <button
+      //                           className={classes.removeAccountBtn}
+      //                           onClick={() => {
+      //                             setInputs((prev) => {
+      //                               const newInputs = { ...prev };
+      //                               const item =
+      //                                 newInputs.inputs[index].inputs[
+      //                                   InnerIndex
+      //                                 ];
+      //                               item.MultiAccounts =
+      //                                 item.MultiAccounts.filter(
+      //                                   (_, i) => i !== accountIndex
+      //                                 );
+      //                               return newInputs;
+      //                             });
+      //                           }}
+      //                           aria-label="Remove account"
+      //                         >
+      //                           {/* Use your Cross icon component if available */}
+      //                           <Cross />
+      //                         </button>
+      //                         <button
+      //                           className={`${classes.accordionButton} ${
+      //                             isOpen ? classes.opened : ""
+      //                           }`}
+      //                           onClick={() => {
+      //                             setOpenDropdowns((prev) => ({
+      //                               ...prev,
+      //                               [accountIndex]: !prev[accountIndex],
+      //                             }));
+      //                           }}
+      //                           aria-label={isOpen ? "Collapse" : "Expand"}
+      //                         >
+      //                           {isOpen ? (
+      //                             <CustomChevronUp />
+      //                           ) : (
+      //                             <CustomChevronDown />
+      //                           )}
+      //                         </button>
+      //                       </div>
+      //                     </div>
+      //                     {isOpen && (
+      //                       <div className={classes.accordionContent}>
+      //                         <p className={classes.setInputsHeading}>
+      //                           Please set Inputs for this account:
+      //                         </p>
+      //                         {account.activities.map((activity, actIdx) => (
+      //                           <div
+      //                             key={actIdx}
+      //                             className={classes.inputWrapper}
+      //                           >
+      //                             <div className={classes.descriptionContainer}>
+      //                               <p>{activity.description}</p>
+      //                             </div>
+      //                             <div className={classes.inputCont}>
+      //                               {/* Activity toggles use accountIndex and actIdx for correct state */}
+      //                               {renderInputContent(
+      //                                 activity,
+      //                                 index,
+      //                                 InnerIndex,
+      //                                 {
+      //                                   isMultiAccountActivity: true,
+      //                                   parentIndex: index,
+      //                                   accountIndex,
+      //                                   actIdx,
+      //                                 }
+      //                               )}
+      //                             </div>
+      //                           </div>
+      //                         ))}
+      //                       </div>
+      //                     )}
+      //                   </div>
+      //                 );
+      //               })}
+      //             </>
+      //           )}
       //         </>
       //       )}
-      //       {/* Always render the date field (hidden) so it's sent to backend even if toggle is off */}
-      //       <input
-      //         type="hidden"
-      //         value={el.date || getTodayDDMMYYYY()}
-      //         readOnly
-      //         name="date"
-      //       />
       //     </div>
       //   );
 
@@ -3946,39 +4234,109 @@ function Input(props) {
                             </label>
                           </div>
                         </div>
-                        {/* Show reply input if comment is checked */}
+                        {/* Show reply input and language dropdown if comment is checked */}
                         {msg.comment && (
-                          <div style={{ marginTop: 15 }}>
-                            <InputText
-                              label={"Reply to post:"}
-                              type={"text"}
-                              placeholder={"Enter reply text"}
-                              name={`reply_${mIdx}`}
-                              handler={(val) => {
-                                setInputs((prevState) => {
-                                  const newInputs = { ...prevState };
-                                  const item =
-                                    newInputs.inputs[index].inputs[InnerIndex];
-                                  item.messages = Array.isArray(item.messages)
-                                    ? item.messages
-                                    : [];
-                                  item.messages[mIdx] = item.messages[mIdx] || {
-                                    url: "",
-                                    keyword: "",
-                                    like: false,
-                                    comment: false,
-                                    share: false,
-                                    reply: "",
-                                    report: false,
-                                    shareGroups: "",
-                                  };
-                                  item.messages[mIdx].reply = val;
-                                  return newInputs;
-                                });
-                              }}
-                              isTaskInputs={true}
-                              value={msg.reply || ""}
-                            />
+                          <div
+                            style={{
+                              marginTop: 15,
+                              display: "flex",
+                              gap: 16,
+                              alignItems: "flex-end",
+                            }}
+                          >
+                            <div style={{ flex: 1 }}>
+                              <InputText
+                                label={"Reply to post:"}
+                                type={"text"}
+                                placeholder={"Enter reply text"}
+                                name={`reply_${mIdx}`}
+                                handler={(val) => {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      reply: "",
+                                      report: false,
+                                      shareGroups: "",
+                                      language: "English",
+                                    };
+                                    item.messages[mIdx].reply = val;
+                                    return newInputs;
+                                  });
+                                }}
+                                isTaskInputs={true}
+                                value={msg.reply || ""}
+                              />
+                            </div>
+                            <div style={{ minWidth: 160 }}>
+                              <label
+                                style={{
+                                  color: "#fff",
+                                  fontWeight: 50,
+                                  marginBottom: 4,
+                                  display: "block",
+                                }}
+                              >
+                                Language:
+                              </label>
+                              <select
+                                style={{
+                                  padding: "6px 12px",
+                                  borderRadius: 6,
+                                  border: "1px solid #000",
+                                  background: "#101010",
+                                  color: "#fff",
+                                  minWidth: 150,
+                                  marginBottom: 4,
+                                }}
+                                value={msg.language || "English"}
+                                onChange={(e) => {
+                                  setInputs((prevState) => {
+                                    const newInputs = { ...prevState };
+                                    const item =
+                                      newInputs.inputs[index].inputs[
+                                        InnerIndex
+                                      ];
+                                    item.messages = Array.isArray(item.messages)
+                                      ? item.messages
+                                      : [];
+                                    item.messages[mIdx] = item.messages[
+                                      mIdx
+                                    ] || {
+                                      url: "",
+                                      keyword: "",
+                                      like: false,
+                                      comment: false,
+                                      share: false,
+                                      reply: "",
+                                      report: false,
+                                      shareGroups: "",
+                                      language: "English",
+                                    };
+                                    item.messages[mIdx].language =
+                                      e.target.value;
+                                    return newInputs;
+                                  });
+                                }}
+                              >
+                                <option value="English">English</option>
+                                <option value="Russian">Russian</option>
+                                <option value="Georgian">Georgian</option>
+                              </select>
+                            </div>
                           </div>
                         )}
                         {/* Show group names input if share is checked */}
@@ -4057,6 +4415,42 @@ function Input(props) {
                   isTaskInputs={true}
                   value={el.group_link}
                 />
+                {/* Language Dropdown */}
+                <div style={{ margin: "5px 0" }}>
+                  <label
+                    style={{
+                      color: "#fff",
+                      fontWeight: 500,
+                      marginBottom: 2,
+                      display: "block",
+                    }}
+                  >
+                    Language:
+                  </label>
+                  <select
+                    style={{
+                      padding: "6px 12px",
+                      borderRadius: 6,
+                      border: "1px solid #000",
+                      background: "#010",
+                      color: "#fff",
+                      minWidth: 150,
+                    }}
+                    value={el.language || "English"}
+                    onChange={(e) => {
+                      inputTextChangeHandler(
+                        index,
+                        InnerIndex,
+                        e.target.value,
+                        "language"
+                      );
+                    }}
+                  >
+                    <option value="English">English</option>
+                    <option value="Russian">Russian</option>
+                    <option value="Georgian">Georgian</option>
+                  </select>
+                </div>
                 <InputText
                   label={"Enter the Prompt for the message here:"}
                   type={"text"}

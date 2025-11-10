@@ -517,12 +517,10 @@ function getTodayDDMMYYYY() {
 
 export function transformData(data) {
   const transformed = [];
-
   // Helper function to process common input types
   const processInput = (inputItem) => {
     const baseType = inputItem.type;
     const result = { [inputItem.name]: inputItem.input };
-
     // Map of input types to their additional properties
     const typeProperties = {
       toggleWithKeywords: [
@@ -536,7 +534,6 @@ export function transformData(data) {
         "minSleepTime",
         "maxSleepTime",
       ],
-
       toggleUrlAndKeyword: [
         "url",
         "positiveKeywords",
@@ -549,7 +546,6 @@ export function transformData(data) {
         "minSleepTime",
         "maxSleepTime",
       ],
-
       toggleAndUnFollowInputs: [
         "minFollowsPerHour",
         "maxFollowsPerHour",
@@ -560,39 +556,28 @@ export function transformData(data) {
         "typeOfUnfollowing",
         "usersToExcludeList",
       ],
-
       toggleAndGap: ["minSleepTime", "maxSleepTime"],
-
       toggleKeywordsAndGap: ["usernamesToExclude"],
-
       toggleDiscordAnalysis: ["serverId", "channelId"],
-
+// Twitter Inputs
       toggleAndInput: ["posts", "numberOfPosts"],
-
       toggleAndURL: ["space_link", "space_duration"],
-
       toggleAndAPI: ["api_key"],
-
       toggleAndProbability: ["probability", "tweetsPerDay", "date"],
-
       toggleAndPrompt: ["prompt"],
-
       toggleAndFollowUnfollow: ["usernames", "usersPerDay", "followAction"],
-
       toggleAndRetweet: ["tweetData"],
-
-      toggleAndYoutube: ["videos", "numberOfVideos"],
-
-      toggleAndSpotify: ["albums", "numberOfAlbums"],
-
       toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
-
+// Spotify Inputs
+      toggleAndSpotify: ["albums", "numberOfAlbums"],
+      spotifyAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
+// YouTube Inputs
+      toggleAndYoutube: ["videos", "numberOfVideos"],
+      youtubeAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
+// Telegram Inputs
       telegramToggleAndURL: ["telegram_group_urls"],
-
       telegramToggleAndPost: ["messages"],
-
-      telegramToggleAndPostShare: ["prompt", "shareGroups", "group_link"],
-
+      telegramToggleAndPostShare: ["prompt", "shareGroups", "group_link", "language"],
       telegramToggleAndReport: ["username", "reportsPerDay"],
     };
 
