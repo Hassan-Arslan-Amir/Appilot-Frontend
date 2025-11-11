@@ -4498,7 +4498,7 @@ function Input(props) {
             {el.input && (
               <>
                 <InputText
-                  label={"Enter the Username to report:"}
+                  label={"Enter the Username (e.g., @wacko0247_bot):"}
                   type={"text"}
                   placeholder={"Place username here"}
                   name={"username"}
@@ -4507,6 +4507,17 @@ function Input(props) {
                   }}
                   isTaskInputs={true}
                   value={el.username}
+                />
+                <InputText
+                  label={"Enter the name (e.g., wackoCity):"}
+                  type={"text"}
+                  placeholder={"Place name here"}
+                  name={"bot_name"}
+                  handler={(val) => {
+                    inputTextChangeHandler(index, InnerIndex, val, "bot_name");
+                  }}
+                  isTaskInputs={true}
+                  value={el.bot_name}
                 />
                 <NumberInput
                   lable={"Number of reports:"}
