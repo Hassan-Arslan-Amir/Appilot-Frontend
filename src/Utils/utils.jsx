@@ -559,7 +559,7 @@ export function transformData(data) {
       toggleAndGap: ["minSleepTime", "maxSleepTime"],
       toggleKeywordsAndGap: ["usernamesToExclude"],
       toggleDiscordAnalysis: ["serverId", "channelId"],
-// Twitter Inputs
+      // Twitter Inputs
       toggleAndInput: ["posts", "numberOfPosts"],
       toggleAndURL: ["space_link", "space_duration"],
       toggleAndAPI: ["api_key"],
@@ -568,17 +568,22 @@ export function transformData(data) {
       toggleAndFollowUnfollow: ["usernames", "usersPerDay", "followAction"],
       toggleAndRetweet: ["tweetData"],
       toggleAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
-// Spotify Inputs
+      // Spotify Inputs
       toggleAndSpotify: ["albums", "numberOfAlbums"],
       spotifyAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
-// YouTube Inputs
+      // YouTube Inputs
       toggleAndYoutube: ["videos", "numberOfVideos"],
       youtubeAndMultiAccounts: ["MultiAccounts", "accountsPerDay"],
-// Telegram Inputs
+      // Telegram Inputs
       telegramToggleAndURL: ["telegram_group_urls"],
       telegramToggleAndPost: ["messages"],
-      telegramToggleAndPostShare: ["prompt", "shareGroups", "group_link", "language"],
-      telegramToggleAndReport: ["username", "reportsPerDay"],
+      telegramToggleAndPostShare: [
+        "prompt",
+        "shareGroups",
+        "group_link",
+        "language",
+      ],
+      telegramToggleAndReport: ["username", "bot_name", "reportsPerDay"],
     };
 
     // Special handling for toggleAndProbability: always set date to today if missing, empty, or not today
